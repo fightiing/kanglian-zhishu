@@ -1,0 +1,2020 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>健康档案管理 - 康联智枢</title>
+    <!-- PWA 相关配置 -->
+    <meta name="theme-color" content="#8B6F47">
+    <meta name="description" content="健康档案管理系统 - 康联智枢，您的个人健康助手">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/1.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="康联智枢">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-size-base: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: url('/static/background.png') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            min-height: 100vh;
+            padding: 20px;
+            color: #5D4E37;
+            font-size: var(--font-size-base);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 248, 240, 0.85);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px 40px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(139, 111, 71, 0.15);
+            text-align: center;
+            border: 2px solid #F5EBE0;
+        }
+
+        h1 {
+            color: #8B6F47;
+            font-size: calc(var(--font-size-base) * 2.25);
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #8B7355;
+            font-size: var(--font-size-base);
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: #5D4E37;
+            text-decoration: none;
+            font-size: calc(var(--font-size-base) * 1.25);
+            font-weight: 600;
+            padding: 18px 35px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(139, 111, 71, 0.15);
+            border: 2px solid #C9A58C;
+            min-width: 160px;
+            text-align: center;
+        }
+
+        .nav-link:hover {
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(139, 111, 71, 0.3);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            color: white;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            background: #FFF8F0;
+            color: #8B6F47;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: calc(var(--font-size-base) * 0.9375);
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(139, 111, 71, 0.1);
+            border: 2px solid #F5EBE0;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 111, 71, 0.3);
+            border-color: #8B6F47;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #F5EBE0;
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(139, 111, 71, 0.12);
+            transition: all 0.3s ease;
+            border: 2px solid #F5EBE0;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .tab-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(139, 111, 71, 0.2);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        h2 {
+            color: #8B6F47;
+            font-size: calc(var(--font-size-base) * 1.5);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #C9A58C;
+            font-weight: 600;
+        }
+
+        h3 {
+            color: #8B6F47;
+            font-size: calc(var(--font-size-base) * 1.125);
+            margin: 20px 0 15px;
+            font-weight: 600;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        h3:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 20px;
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            border-radius: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #8B6F47;
+            font-size: calc(var(--font-size-base) * 0.9375);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #F5EBE0;
+            border-radius: 12px;
+            font-size: calc(var(--font-size-base) * 0.9375);
+            transition: all 0.3s ease;
+            background: #FFFBF7;
+            box-shadow: 0 2px 5px rgba(139, 111, 71, 0.05);
+            color: #5D4E37;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #C9A58C;
+            box-shadow: 0 0 0 4px rgba(201, 165, 140, 0.2);
+            background: #ffffff;
+            transform: scale(1.01);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(139, 111, 71, 0.3);
+            letter-spacing: 0.5px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 111, 71, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .card {
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFF8F0 100%);
+            border: 1px solid #F5EBE0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s ease;
+            box-shadow: 0 5px 20px rgba(139, 111, 71, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(139, 111, 71, 0.2);
+        }
+
+        .card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+        }
+
+        .card h4 {
+            color: #8B6F47;
+            margin-bottom: 15px;
+            font-size: calc(var(--font-size-base) * 1.125);
+            font-weight: 600;
+        }
+
+        .card p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: #5D4E37;
+            font-size: var(--font-size-base);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: calc(var(--font-size-base) * 0.75);
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-missed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: var(--font-size-base);
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .alert {
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert.success {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        .alert.error {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        /* 健康数据概览样式 */
+        .health-overview {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(139, 111, 71, 0.15);
+            border: 2px solid #F5EBE0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #FFF8F0 0%, #F5EBE0 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #E8DCC8;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(139, 111, 71, 0.2);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #8B6F47;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: #A89070;
+            font-weight: 500;
+        }
+
+        .visualization-section {
+            margin-top: 20px;
+        }
+
+        .timeline-container {
+            background: #FFF8F0;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #E8DCC8;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            border-radius: 50%;
+            border: 3px solid #FFF;
+            box-shadow: 0 2px 8px rgba(139, 111, 71, 0.3);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 13px;
+            top: 24px;
+            width: 2px;
+            height: calc(100% + 20px);
+            background: #E8DCC8;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-date {
+            font-size: 14px;
+            color: #A89070;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content {
+            background: #FFF;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid #F5EBE0;
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #8B6F47;
+            margin-bottom: 5px;
+        }
+
+        .timeline-desc {
+            font-size: 14px;
+            color: #6B5B45;
+        }
+
+        .chart-container {
+            background: #FFF8F0;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #E8DCC8;
+        }
+
+        .medication-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .medication-bar:last-child {
+            margin-bottom: 0;
+        }
+
+        .med-name {
+            width: 150px;
+            font-size: 14px;
+            color: #8B6F47;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .med-bar-wrapper {
+            flex: 1;
+            background: #F5EBE0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 15px;
+        }
+
+        .med-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #C9A58C 0%, #8B6F47 100%);
+            border-radius: 15px;
+            transition: width 0.8s ease;
+        }
+
+        .med-count {
+            width: 50px;
+            text-align: right;
+            font-size: 14px;
+            font-weight: 600;
+            color: #8B6F47;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #A89070;
+            font-size: 16px;
+        }
+
+        /* 热力图样式 */
+        .heatmap-container {
+            background: #FFF8F0;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #E8DCC8;
+            margin-top: 20px;
+        }
+
+        .heatmap-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #8B6F47;
+            margin-bottom: 20px;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #FFF;
+            font-weight: bold;
+            min-height: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .heatmap-cell.level-0 {
+            background: #F5EBE0;
+            color: #A89070;
+        }
+
+        .heatmap-cell.level-1 {
+            background: #C9A58C;
+        }
+
+        .heatmap-cell.level-2 {
+            background: #B8956E;
+        }
+
+        .heatmap-cell.level-3 {
+            background: #8B6F47;
+        }
+
+        .heatmap-cell.level-4 {
+            background: #6B5237;
+        }
+
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #A89070;
+        }
+
+        .heatmap-legend-item {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .heatmap-label {
+            text-align: center;
+            font-size: 12px;
+            color: #8B6F47;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tab {
+                text-align: left;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-link {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>康联智枢——面向主动健康的知识驱动医疗智能协同网络</h1>
+            <p class="subtitle">基于知识图谱 + RAG + DeepSeek大模型的智能医疗咨询系统</p>
+
+            <!-- 字体大小控制 -->
+            <div style="display: flex; justify-content: center; margin-bottom: 20px; gap: 8px;">
+                <button id="decrease-font" class="btn"
+                    style="background: #f8f9fa; color: #5D4E37; border: 2px solid #C9A58C; padding: 6px 12px; font-size: 14px; width: 40px; text-align: center; border-radius: 6px;">A-</button>
+                <button id="reset-font" class="btn"
+                    style="background: #f8f9fa; color: #5D4E37; border: 2px solid #C9A58C; padding: 6px 12px; font-size: 14px; width: 40px; text-align: center; border-radius: 6px;">A</button>
+                <button id="increase-font" class="btn"
+                    style="background: #f8f9fa; color: #5D4E37; border: 2px solid #C9A58C; padding: 6px 12px; font-size: 14px; width: 40px; text-align: center; border-radius: 6px;">A+</button>
+            </div>
+
+            <!-- 老年友好型导航栏 -->
+            <div class="nav-links">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/drug_recognize" class="nav-link">药品识别</a>
+                <a href="/voice_ask" class="nav-link">语音询问</a>
+                <a href="/doctor_recommend" class="nav-link">医生推荐</a>
+                <a href="/health_record" class="nav-link active">健康档案</a>
+                <a href="/graph" class="nav-link">知识图谱</a>
+            </div>
+        </div>
+
+        <!-- 健康档案管理内容 -->
+        <div class="header">
+            <h1>健康档案管理</h1>
+            <p class="subtitle">康联智枢 - 您的个人健康助手</p>
+        </div>
+
+        <!-- 健康数据概览 -->
+        <div class="health-overview" id="healthOverview" style="display: none;">
+            <h2 style="margin-bottom: 20px; color: #8B6F47;">📊 健康数据概览</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="statDiseases">0</div>
+                    <div class="stat-label">病史记录</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statAllergies">0</div>
+                    <div class="stat-label">过敏史</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statMedications">0</div>
+                    <div class="stat-label">用药记录</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statVitals">0</div>
+                    <div class="stat-label">生理指标</div>
+                </div>
+            </div>
+
+            <!-- 可视化区域 -->
+            <div class="visualization-section">
+                <h3 style="margin: 25px 0 15px; color: #8B6F47;">📈 病史时间线</h3>
+                <div id="timelineContainer" class="timeline-container"></div>
+
+                <h3 style="margin: 30px 0 15px; color: #8B6F47;">💊 用药分布</h3>
+                <div id="medicationChart" class="chart-container"></div>
+
+                <h3 style="margin: 30px 0 15px; color: #8B6F47;">📅 用药依从性热力图（近30天）</h3>
+                <div id="adherenceHeatmap" class="heatmap-container">
+                    <div class="heatmap-grid" id="heatmapGrid" style="grid-template-columns: repeat(7, 1fr);"></div>
+                    <div class="heatmap-legend">
+                        <span>用药情况：</span>
+                        <div class="heatmap-legend-item level-0"></div><span>未记录</span>
+                        <div class="heatmap-legend-item level-1"></div><span>1次</span>
+                        <div class="heatmap-legend-item level-2"></div><span>2次</span>
+                        <div class="heatmap-legend-item level-3"></div><span>3次</span>
+                        <div class="heatmap-legend-item level-4"></div><span>4次+</span>
+                    </div>
+                    <div class="heatmap-label">每行代表一周，从周一开始</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="basic-info">基本信息</div>
+            <div class="nav-tab" data-tab="medical-history">病史记录</div>
+            <div class="nav-tab" data-tab="vital-signs">生理指标</div>
+            <div class="nav-tab" data-tab="medications">用药管理</div>
+            <div class="nav-tab" data-tab="adherence">用药依从性</div>
+            <div class="nav-tab" data-tab="family-doctor">家属与医生</div>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="tab-content">
+            <div class="tab-pane active" id="basic-info">
+                <h2>个人健康档案</h2>
+
+                <div class="form-group">
+                    <label for="user-id">用户ID</label>
+                    <input type="text" id="user-id" placeholder="请输入用户ID">
+                </div>
+
+                <h3>基本信息</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="name">姓名</label>
+                        <input type="text" id="name" placeholder="请输入姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="age">年龄</label>
+                        <input type="number" id="age" placeholder="请输入年龄">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">性别</label>
+                        <select id="gender">
+                            <option value="">请选择</option>
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">联系电话</label>
+                        <input type="text" id="phone" placeholder="请输入联系电话">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">地址</label>
+                    <textarea id="address" rows="3" placeholder="请输入地址"></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="createHealthRecord()">创建健康档案</button>
+                <button class="btn btn-secondary" onclick="getHealthRecord()">获取健康档案</button>
+
+                <div id="basic-info-result" class="alert" style="display: none;"></div>
+            </div>
+
+            <!-- 病史记录 -->
+            <div class="tab-pane" id="medical-history">
+                <h2>病史记录</h2>
+
+                <div class="form-group">
+                    <label for="history-user-id">用户ID</label>
+                    <input type="text" id="history-user-id" placeholder="请输入用户ID">
+                </div>
+
+                <h3>添加病史</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="disease">疾病名称</label>
+                        <input type="text" id="disease" placeholder="请输入疾病名称">
+                    </div>
+                    <div class="form-group">
+                        <label for="diagnosis-date">诊断日期</label>
+                        <input type="date" id="diagnosis-date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="disease-description">病情描述</label>
+                    <textarea id="disease-description" rows="3" placeholder="请输入病情描述"></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="addMedicalHistory()">添加病史</button>
+
+                <h3>添加过敏史</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="allergen">过敏原</label>
+                        <input type="text" id="allergen" placeholder="请输入过敏原">
+                    </div>
+                    <div class="form-group">
+                        <label for="reaction">反应症状</label>
+                        <input type="text" id="reaction" placeholder="请输入反应症状">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="addAllergy()">添加过敏史</button>
+
+                <div id="history-result" class="alert" style="display: none;"></div>
+            </div>
+
+            <!-- 生理指标 -->
+            <div class="tab-pane" id="vital-signs">
+                <h2>生理指标记录</h2>
+
+                <div class="form-group">
+                    <label for="vital-user-id">用户ID</label>
+                    <input type="text" id="vital-user-id" placeholder="请输入用户ID">
+                </div>
+
+                <h3>添加生理指标</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="vital-type">指标类型</label>
+                        <select id="vital-type" onchange="updateVitalForm()">
+                            <option value="">请选择</option>
+                            <option value="blood_pressure">血压</option>
+                            <option value="heart_rate">心率</option>
+                            <option value="blood_sugar">血糖</option>
+                            <option value="temperature">体温</option>
+                            <option value="weight">体重</option>
+                            <option value="oxygen">血氧</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vital-value">测量值</label>
+                        <input type="number" id="vital-value" placeholder="请输入测量值">
+                    </div>
+                </div>
+
+                <div class="grid" id="secondary-value-group" style="display: none;">
+                    <div class="form-group">
+                        <label for="vital-secondary-value">舒张压/辅助值</label>
+                        <input type="number" id="vital-secondary-value" placeholder="如舒张压">
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="vital-measured-at">测量时间</label>
+                        <input type="datetime-local" id="vital-measured-at">
+                    </div>
+                    <div class="form-group">
+                        <label for="vital-notes">备注</label>
+                        <input type="text" id="vital-notes" placeholder="如：餐后、睡前">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="addVitalSign()">添加记录</button>
+
+                <h3>查看历史记录</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="vital-history-type">选择指标</label>
+                        <select id="vital-history-type">
+                            <option value="">全部</option>
+                            <option value="blood_pressure">血压</option>
+                            <option value="heart_rate">心率</option>
+                            <option value="blood_sugar">血糖</option>
+                            <option value="temperature">体温</option>
+                            <option value="weight">体重</option>
+                            <option value="oxygen">血氧</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vital-history-days">时间范围（天）</label>
+                        <input type="number" id="vital-history-days" value="30" min="1" max="365">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="getVitalHistory()">查看历史</button>
+                <button class="btn btn-primary" onclick="getHealthSummary()">健康摘要</button>
+
+                <div id="vital-result" class="alert" style="display: none;"></div>
+                <div id="vital-history" style="margin-top: 20px;"></div>
+                <div id="health-summary" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- 用药管理 -->
+            <div class="tab-pane" id="medications">
+                <h2>用药管理</h2>
+
+                <div class="form-group">
+                    <label for="med-user-id">用户ID</label>
+                    <input type="text" id="med-user-id" placeholder="请输入用户ID">
+                </div>
+
+                <h3>添加用药记录</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="med-name">药品名称</label>
+                        <input type="text" id="med-name" placeholder="请输入药品名称">
+                    </div>
+                    <div class="form-group">
+                        <label for="dosage">剂量</label>
+                        <input type="text" id="dosage" placeholder="请输入剂量">
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="frequency">用药频率</label>
+                        <input type="text" id="frequency" placeholder="如：每日3次">
+                    </div>
+                    <div class="form-group">
+                        <label for="start-date">开始日期</label>
+                        <input type="date" id="start-date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="med-notes">备注</label>
+                    <textarea id="med-notes" rows="3" placeholder="请输入备注"></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="addMedication()">添加用药记录</button>
+
+                <h3>设置用药提醒</h3>
+                <div class="form-group">
+                    <label for="reminder-times">用药时间</label>
+                    <input type="text" id="reminder-times" placeholder="如：08:00,12:00,18:00">
+                </div>
+
+                <button class="btn btn-primary" onclick="setMedicationReminder()">设置用药提醒</button>
+
+                <div id="med-result" class="alert" style="display: none;"></div>
+            </div>
+
+            <!-- 用药依从性 -->
+            <div class="tab-pane" id="adherence">
+                <h2>用药依从性</h2>
+
+                <div class="form-group">
+                    <label for="adherence-user-id">用户ID</label>
+                    <input type="text" id="adherence-user-id" placeholder="请输入用户ID">
+                </div>
+
+                <button class="btn btn-primary" onclick="getTodayReminders()">获取今日提醒</button>
+                <button class="btn btn-primary" onclick="getUserReminders()">查看所有提醒</button>
+                <button class="btn btn-primary" onclick="generateAdherenceReport()">生成依从性报告</button>
+
+                <div id="adherence-result" class="alert" style="display: none;"></div>
+
+                <div id="reminders-list" style="margin-top: 20px;"></div>
+                <div id="report-content" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- 家属与医生管理 -->
+            <div class="tab-pane" id="family-doctor">
+                <h2>家属与医生管理</h2>
+
+                <div class="form-group">
+                    <label for="family-user-id">用户ID</label>
+                    <input type="text" id="family-user-id" placeholder="请输入用户ID">
+                </div>
+
+                <h3>添加家属信息</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="family-name">姓名</label>
+                        <input type="text" id="family-name" placeholder="请输入家属姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="family-relationship">关系</label>
+                        <input type="text" id="family-relationship" placeholder="如：子女、配偶">
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="family-phone">联系电话</label>
+                        <input type="text" id="family-phone" placeholder="请输入联系电话">
+                    </div>
+                    <div class="form-group">
+                        <label for="family-email">电子邮箱</label>
+                        <input type="text" id="family-email" placeholder="请输入电子邮箱">
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="family-can-view">可查看健康档案</label>
+                        <select id="family-can-view">
+                            <option value="true">是</option>
+                            <option value="false">否</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="family-can-edit">可编辑健康档案</label>
+                        <select id="family-can-edit">
+                            <option value="false">否</option>
+                            <option value="true">是</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="addFamilyMember()">添加家属</button>
+
+                <h3 style="margin-top: 30px;">添加医生信息</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="doctor-name">姓名</label>
+                        <input type="text" id="doctor-name" placeholder="请输入医生姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="doctor-department">科室</label>
+                        <input type="text" id="doctor-department" placeholder="如：心血管内科">
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="doctor-hospital">医院</label>
+                        <input type="text" id="doctor-hospital" placeholder="请输入医院名称">
+                    </div>
+                    <div class="form-group">
+                        <label for="doctor-phone">联系电话</label>
+                        <input type="text" id="doctor-phone" placeholder="请输入联系电话">
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="doctor-can-view">可查看健康档案</label>
+                        <select id="doctor-can-view">
+                            <option value="true">是</option>
+                            <option value="false">否</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="doctor-can-edit">可编辑健康档案</label>
+                        <select id="doctor-can-edit">
+                            <option value="true">是</option>
+                            <option value="false">否</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="addDoctor()">添加医生</button>
+
+                <h3 style="margin-top: 30px;">查看家属与医生信息</h3>
+                <button class="btn btn-primary" onclick="getFamilyDoctorInfo()">查看信息</button>
+
+                <h3 style="margin-top: 30px;">生成访问链接</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="link-viewer-id">查看者ID/电话</label>
+                        <input type="text" id="link-viewer-id" placeholder="请输入家属或医生的ID或电话">
+                    </div>
+                    <div class="form-group">
+                        <label for="link-viewer-type">查看者类型</label>
+                        <select id="link-viewer-type">
+                            <option value="family">家属</option>
+                            <option value="doctor">医生</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="generateAccessLink()">生成访问链接</button>
+
+                <div id="family-doctor-result" class="alert" style="display: none;"></div>
+                <div id="family-doctor-info" style="margin-top: 20px;"></div>
+                <div id="access-link-result"
+                    style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 12px; display: none;">
+                    <h4>专属访问链接</h4>
+                    <p id="access-link-url" style="word-break: break-all;"></p>
+                    <button class="btn btn-primary" onclick="copyAccessLink()" style="margin-top: 10px;">复制链接</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 标签切换
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function () {
+                // 移除所有活动状态
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+                // 添加活动状态
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // 显示结果
+        function showResult(elementId, message, isSuccess) {
+            const resultElement = document.getElementById(elementId);
+            resultElement.textContent = message;
+            resultElement.className = isSuccess ? 'alert alert-success' : 'alert alert-danger';
+            resultElement.style.display = 'block';
+
+            // 3秒后隐藏
+            setTimeout(() => {
+                resultElement.style.display = 'none';
+            }, 3000);
+        }
+
+        // 创建健康档案
+        function createHealthRecord() {
+            const user_id = document.getElementById('user-id').value;
+            const basic_info = {
+                name: document.getElementById('name').value,
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value
+            };
+
+            fetch('/api/health/record/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, basic_info })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    showResult('basic-info-result', data.message, data.success);
+                })
+                .catch(error => {
+                    showResult('basic-info-result', '创建健康档案失败', false);
+                });
+        }
+
+        // 获取健康档案
+        function getHealthRecord() {
+            const user_id = document.getElementById('user-id').value;
+
+            fetch(`/api/health/record/get?user_id=${user_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const record = data.data;
+                        document.getElementById('name').value = record.basic_info.name || '';
+                        document.getElementById('age').value = record.basic_info.age || '';
+                        document.getElementById('gender').value = record.basic_info.gender || '';
+                        document.getElementById('phone').value = record.basic_info.phone || '';
+                        document.getElementById('address').value = record.basic_info.address || '';
+
+                        // 显示健康数据概览
+                        loadHealthOverview(record);
+
+                        showResult('basic-info-result', '健康档案获取成功', true);
+                    } else {
+                        showResult('basic-info-result', data.message, false);
+                    }
+                })
+                .catch(error => {
+                    showResult('basic-info-result', '获取健康档案失败', false);
+                });
+        }
+
+        // 健康数据可视化功能
+        function loadHealthOverview(record) {
+            document.getElementById('healthOverview').style.display = 'block';
+
+            // 更新统计卡片
+            document.getElementById('statDiseases').textContent = record.medical_history?.length || 0;
+            document.getElementById('statAllergies').textContent = record.allergies?.length || 0;
+            document.getElementById('statMedications').textContent = record.medications?.length || 0;
+            document.getElementById('statVitals').textContent = record.vital_signs?.length || 0;
+
+            // 渲染病史时间线
+            renderTimeline(record.medical_history || []);
+
+            // 渲染用药分布图表
+            renderMedicationChart(record.medications || []);
+
+            // 渲染用药依从性热力图
+            renderAdherenceHeatmap(record.medications || []);
+        }
+
+        // 渲染病史时间线
+        function renderTimeline(history) {
+            const container = document.getElementById('timelineContainer');
+
+            if (history.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无病史记录</div>';
+                return;
+            }
+
+            // 按日期排序
+            const sortedHistory = [...history].sort((a, b) => {
+                const dateA = new Date(a.diagnosis_date || a.added_at);
+                const dateB = new Date(b.diagnosis_date || b.added_at);
+                return dateB - dateA;
+            });
+
+            let html = '';
+            sortedHistory.forEach(item => {
+                const date = item.diagnosis_date || item.added_at?.split('T')[0] || '未知日期';
+                const disease = item.disease || '未知疾病';
+                const desc = item.description || '暂无描述';
+
+                html += `
+                    <div class="timeline-item">
+                        <div>
+                            <div class="timeline-date">${date}</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">${disease}</div>
+                                <div class="timeline-desc">${desc}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // 渲染用药分布图表
+        function renderMedicationChart(medications) {
+            const container = document.getElementById('medicationChart');
+
+            if (medications.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无用药记录</div>';
+                return;
+            }
+
+            // 统计每种药物的使用次数
+            const medCounts = {};
+            medications.forEach(med => {
+                const name = med.name || '未知药物';
+                medCounts[name] = (medCounts[name] || 0) + 1;
+            });
+
+            // 转换为数组并排序
+            const medArray = Object.entries(medCounts)
+                .map(([name, count]) => ({ name, count }))
+                .sort((a, b) => b.count - a.count);
+
+            const maxCount = Math.max(...medArray.map(m => m.count));
+
+            let html = '';
+            medArray.forEach(med => {
+                const percentage = (med.count / maxCount) * 100;
+                html += `
+                    <div class="medication-bar">
+                        <div class="med-name">${med.name.length > 8 ? med.name.substring(0, 8) + '...' : med.name}</div>
+                        <div class="med-bar-wrapper">
+                            <div class="med-bar-fill" style="width: ${percentage}%;"></div>
+                        </div>
+                        <div class="med-count">${med.count}次</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // 渲染用药依从性热力图
+        function renderAdherenceHeatmap(medications) {
+            const container = document.getElementById('heatmapGrid');
+
+            // 生成近30天的日期
+            const today = new Date();
+            const days = [];
+            for (let i = 29; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                days.push(date);
+            }
+
+            // 统计每天的用药次数
+            const medicationByDate = {};
+            medications.forEach(med => {
+                if (med.added_at) {
+                    const dateStr = med.added_at.split('T')[0];
+                    medicationByDate[dateStr] = (medicationByDate[dateStr] || 0) + 1;
+                } else if (med.start_date) {
+                    const dateStr = med.start_date;
+                    medicationByDate[dateStr] = (medicationByDate[dateStr] || 0) + 1;
+                }
+            });
+
+            // 生成热力图单元格
+            let html = '';
+            days.forEach(date => {
+                const dateStr = date.toISOString().split('T')[0];
+                const count = medicationByDate[dateStr] || 0;
+                const dayName = date.toLocaleDateString('zh-CN', { weekday: 'short' }).replace('周', '');
+
+                let level = 'level-0';
+                if (count >= 4) level = 'level-4';
+                else if (count >= 3) level = 'level-3';
+                else if (count >= 2) level = 'level-2';
+                else if (count >= 1) level = 'level-1';
+
+                html += `<div class="heatmap-cell ${level}" title="${dateStr} ${dayName}: ${count}次用药">${dayName}</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // 添加病史
+        function addMedicalHistory() {
+            const user_id = document.getElementById('history-user-id').value;
+            const medical_record = {
+                disease: document.getElementById('disease').value,
+                diagnosis_date: document.getElementById('diagnosis-date').value,
+                description: document.getElementById('disease-description').value
+            };
+
+            fetch('/api/health/record/add-history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, medical_record })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    showResult('history-result', data.message, data.success);
+                })
+                .catch(error => {
+                    showResult('history-result', '添加病史失败', false);
+                });
+        }
+
+        // 添加过敏史
+        function addAllergy() {
+            const user_id = document.getElementById('history-user-id').value;
+            const allergy = {
+                substance: document.getElementById('allergen').value,
+                reaction: document.getElementById('reaction').value
+            };
+
+            fetch('/api/health/record/add-allergy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, allergy })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    showResult('history-result', data.message, data.success);
+                })
+                .catch(error => {
+                    showResult('history-result', '添加过敏史失败', false);
+                });
+        }
+
+        // 添加用药记录
+        function addMedication() {
+            const user_id = document.getElementById('med-user-id').value;
+            const medication = {
+                name: document.getElementById('med-name').value,
+                dosage: document.getElementById('dosage').value,
+                frequency: document.getElementById('frequency').value,
+                start_date: document.getElementById('start-date').value,
+                notes: document.getElementById('med-notes').value
+            };
+
+            fetch('/api/health/record/add-medication', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, medication })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    showResult('med-result', data.message, data.success);
+                })
+                .catch(error => {
+                    showResult('med-result', '添加用药记录失败', false);
+                });
+        }
+
+        // 设置用药提醒
+        function setMedicationReminder() {
+            const user_id = document.getElementById('med-user-id').value;
+            const medication_info = {
+                medication_name: document.getElementById('med-name').value,
+                dosage: document.getElementById('dosage').value,
+                frequency: document.getElementById('frequency').value,
+                times: document.getElementById('reminder-times').value.split(','),
+                start_date: document.getElementById('start-date').value,
+                notes: document.getElementById('med-notes').value
+            };
+
+            fetch('/api/medication/reminder/set', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, medication_info })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    showResult('med-result', data.message, data.success);
+                })
+                .catch(error => {
+                    showResult('med-result', '设置用药提醒失败', false);
+                });
+        }
+
+        // 根据选择的指标类型更新表单
+        function updateVitalForm() {
+            const vitalType = document.getElementById('vital-type').value;
+            const secondaryGroup = document.getElementById('secondary-value-group');
+            const valueInput = document.getElementById('vital-value');
+            const valueLabel = valueInput.previousElementSibling;
+
+            if (vitalType === 'blood_pressure') {
+                secondaryGroup.style.display = 'grid';
+                valueLabel.textContent = '收缩压 (mmHg)';
+            } else if (vitalType === 'heart_rate') {
+                secondaryGroup.style.display = 'none';
+                valueLabel.textContent = '心率 (次/分)';
+            } else if (vitalType === 'blood_sugar') {
+                secondaryGroup.style.display = 'none';
+                valueLabel.textContent = '血糖 (mmol/L)';
+            } else if (vitalType === 'temperature') {
+                secondaryGroup.style.display = 'none';
+                valueLabel.textContent = '体温 (°C)';
+            } else if (vitalType === 'weight') {
+                secondaryGroup.style.display = 'none';
+                valueLabel.textContent = '体重 (kg)';
+            } else if (vitalType === 'oxygen') {
+                secondaryGroup.style.display = 'none';
+                valueLabel.textContent = '血氧饱和度 (%)';
+            } else {
+                secondaryGroup.style.display = 'none';
+                valueLabel.textContent = '测量值';
+            }
+        }
+
+        // 添加生理指标记录
+        function addVitalSign() {
+            const user_id = document.getElementById('vital-user-id').value;
+            const vital_type = document.getElementById('vital-type').value;
+            const value = parseFloat(document.getElementById('vital-value').value);
+            const secondary_value = document.getElementById('vital-secondary-value').value;
+            const measured_at = document.getElementById('vital-measured-at').value;
+            const notes = document.getElementById('vital-notes').value;
+
+            if (!user_id || !vital_type || !value) {
+                showResult('vital-result', '请填写完整的测量信息', false);
+                return;
+            }
+
+            const vital_sign = {
+                type: vital_type,
+                value: value
+            };
+
+            if (secondary_value) {
+                vital_sign.secondary_value = parseFloat(secondary_value);
+            }
+
+            if (measured_at) {
+                vital_sign.measured_at = measured_at;
+            }
+
+            if (notes) {
+                vital_sign.notes = notes;
+            }
+
+            fetch('/api/health/vital/sign/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, vital_sign })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    showResult('vital-result', data.message, data.success);
+                })
+                .catch(error => {
+                    showResult('vital-result', '添加生理指标失败', false);
+                });
+        }
+
+        // 添加家属信息
+        function addFamilyMember() {
+            const user_id = document.getElementById('family-user-id').value;
+            const family_member = {
+                name: document.getElementById('family-name').value,
+                relationship: document.getElementById('family-relationship').value,
+                phone: document.getElementById('family-phone').value,
+                email: document.getElementById('family-email').value,
+                can_view: document.getElementById('family-can-view').value === 'true',
+                can_edit: document.getElementById('family-can-edit').value === 'true'
+            };
+
+            fetch('/api/health/record/add-family-member', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, family_member })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    showResult('family-doctor-result', data.message, data.success);
+                })
+                .catch(error => {
+                    showResult('family-doctor-result', '添加家属信息失败', false);
+                });
+        }
+
+        // 添加医生信息
+        function addDoctor() {
+            const user_id = document.getElementById('family-user-id').value;
+            const doctor = {
+                name: document.getElementById('doctor-name').value,
+                department: document.getElementById('doctor-department').value,
+                hospital: document.getElementById('doctor-hospital').value,
+                phone: document.getElementById('doctor-phone').value,
+                can_view: document.getElementById('doctor-can-view').value === 'true',
+                can_edit: document.getElementById('doctor-can-edit').value === 'true'
+            };
+
+            fetch('/api/health/record/add-doctor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, doctor })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    showResult('family-doctor-result', data.message, data.success);
+                })
+                .catch(error => {
+                    showResult('family-doctor-result', '添加医生信息失败', false);
+                });
+        }
+
+        // 查看家属与医生信息
+        function getFamilyDoctorInfo() {
+            const user_id = document.getElementById('family-user-id').value;
+
+            fetch(`/api/health/record/get?user_id=${user_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const record = data.data;
+                        const familyMembers = record.family_members || [];
+                        const doctors = record.doctors || [];
+
+                        let html = '';
+
+                        // 显示家属信息
+                        if (familyMembers.length > 0) {
+                            html += '<h4>家属信息</h4>';
+                            html += '<div class="grid">';
+                            familyMembers.forEach(member => {
+                                html += `
+                                    <div class="card">
+                                        <h4>${member.name}</h4>
+                                        <p><strong>关系：</strong>${member.relationship}</p>
+                                        <p><strong>电话：</strong>${member.phone}</p>
+                                        <p><strong>邮箱：</strong>${member.email}</p>
+                                        <p><strong>权限：</strong>${member.can_view ? '可查看' : '不可查看'} / ${member.can_edit ? '可编辑' : '不可编辑'}</p>
+                                    </div>
+                                `;
+                            });
+                            html += '</div>';
+                        } else {
+                            html += '<p>暂无家属信息</p>';
+                        }
+
+                        // 显示医生信息
+                        if (doctors.length > 0) {
+                            html += '<h4 style="margin-top: 30px;">医生信息</h4>';
+                            html += '<div class="grid">';
+                            doctors.forEach(doctor => {
+                                html += `
+                                    <div class="card">
+                                        <h4>${doctor.name}</h4>
+                                        <p><strong>科室：</strong>${doctor.department}</p>
+                                        <p><strong>医院：</strong>${doctor.hospital}</p>
+                                        <p><strong>电话：</strong>${doctor.phone}</p>
+                                        <p><strong>权限：</strong>${doctor.can_view ? '可查看' : '不可查看'} / ${doctor.can_edit ? '可编辑' : '不可编辑'}</p>
+                                    </div>
+                                `;
+                            });
+                            html += '</div>';
+                        } else {
+                            html += '<p>暂无医生信息</p>';
+                        }
+
+                        document.getElementById('family-doctor-info').innerHTML = html;
+                        showResult('family-doctor-result', '获取家属与医生信息成功', true);
+                    } else {
+                        showResult('family-doctor-result', data.message, false);
+                    }
+                })
+                .catch(error => {
+                    showResult('family-doctor-result', '获取家属与医生信息失败', false);
+                });
+        }
+
+        // 生成访问链接
+        function generateAccessLink() {
+            const user_id = document.getElementById('family-user-id').value;
+            const viewer_id = document.getElementById('link-viewer-id').value;
+            const viewer_type = document.getElementById('link-viewer-type').value;
+
+            if (!user_id || !viewer_id) {
+                showResult('family-doctor-result', '请输入用户ID和查看者ID', false);
+                return;
+            }
+
+            fetch('/api/health/record/generate-access-link', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, viewer_id, viewer_type })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const accessLink = data.data;
+                        document.getElementById('access-link-url').textContent = accessLink;
+                        document.getElementById('access-link-result').style.display = 'block';
+                        showResult('family-doctor-result', '访问链接生成成功', true);
+                    } else {
+                        showResult('family-doctor-result', data.message, false);
+                    }
+                })
+                .catch(error => {
+                    showResult('family-doctor-result', '生成访问链接失败', false);
+                });
+        }
+
+        // 复制访问链接
+        function copyAccessLink() {
+            const accessLink = document.getElementById('access-link-url').textContent;
+            navigator.clipboard.writeText(accessLink)
+                .then(() => {
+                    showResult('family-doctor-result', '链接已复制到剪贴板', true);
+                })
+                .catch(err => {
+                    showResult('family-doctor-result', '复制链接失败', false);
+                });
+        }
+
+        // 获取生理指标历史记录
+        function getVitalHistory() {
+            const user_id = document.getElementById('vital-user-id').value;
+            const vital_type = document.getElementById('vital-history-type').value;
+            const days = parseInt(document.getElementById('vital-history-days').value) || 30;
+
+            if (!user_id) {
+                showResult('vital-result', '请输入用户ID', false);
+                return;
+            }
+
+            let url = `/api/health/vital/signs?user_id=${user_id}&days=${days}`;
+            if (vital_type) {
+                url += `&vital_type=${vital_type}`;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayVitalHistory(data.data);
+                        showResult('vital-result', '历史记录获取成功', true);
+                    } else {
+                        showResult('vital-result', data.message, false);
+                    }
+                })
+                .catch(error => {
+                    showResult('vital-result', '获取历史记录失败', false);
+                });
+        }
+
+        // 获取健康摘要
+        function getHealthSummary() {
+            const user_id = document.getElementById('vital-user-id').value;
+
+            if (!user_id) {
+                showResult('vital-result', '请输入用户ID', false);
+                return;
+            }
+
+            fetch(`/api/health/vital/summary?user_id=${user_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayHealthSummary(data.data);
+                        showResult('vital-result', '健康摘要获取成功', true);
+                    } else {
+                        showResult('vital-result', data.message, false);
+                    }
+                })
+                .catch(error => {
+                    showResult('vital-result', '获取健康摘要失败', false);
+                });
+        }
+
+        // 显示生理指标历史记录
+        function displayVitalHistory(signs) {
+            const container = document.getElementById('vital-history');
+            container.innerHTML = '';
+
+            if (!signs || signs.length === 0) {
+                container.innerHTML = '<p>暂无记录</p>';
+                return;
+            }
+
+            const typeNames = {
+                'blood_pressure': '血压',
+                'heart_rate': '心率',
+                'blood_sugar': '血糖',
+                'temperature': '体温',
+                'weight': '体重',
+                'oxygen': '血氧'
+            };
+
+            signs.forEach(sign => {
+                let valueDisplay = sign.value;
+                if (sign.type === 'blood_pressure') {
+                    valueDisplay = `${sign.value}/${sign.secondary_value} mmHg`;
+                } else if (sign.type === 'heart_rate') {
+                    valueDisplay = `${sign.value} 次/分`;
+                } else if (sign.type === 'blood_sugar') {
+                    valueDisplay = `${sign.value} mmol/L`;
+                } else if (sign.type === 'temperature') {
+                    valueDisplay = `${sign.value} °C`;
+                } else if (sign.type === 'weight') {
+                    valueDisplay = `${sign.value} kg`;
+                } else if (sign.type === 'oxygen') {
+                    valueDisplay = `${sign.value} %`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h4>${typeNames[sign.type] || sign.type} <span class="status-badge status-active">记录</span></h4>
+                    <p><strong>测量值:</strong> ${valueDisplay}</p>
+                    <p><strong>测量时间:</strong> ${new Date(sign.measured_at || sign.added_at).toLocaleString()}</p>
+                    ${sign.notes ? `<p><strong>备注:</strong> ${sign.notes}</p>` : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 显示健康摘要
+        function displayHealthSummary(summary) {
+            const container = document.getElementById('health-summary');
+            container.innerHTML = '';
+
+            if (!summary) {
+                container.innerHTML = '<p>暂无数据</p>';
+                return;
+            }
+
+            let html = '<div class="card"><h4>健康摘要</h4>';
+            html += `<p><strong>用户:</strong> ${summary.basic_info?.name || summary.user_id}</p>`;
+            html += `<p><strong>统计周期:</strong> 近30天</p>`;
+            html += '<h5>指标统计</h5>';
+            html += `<p>血压记录: ${summary.statistics?.blood_pressure_records || 0} 条</p>`;
+            html += `<p>心率记录: ${summary.statistics?.heart_rate_records || 0} 条</p>`;
+            html += `<p>血糖记录: ${summary.statistics?.blood_sugar_records || 0} 条</p>`;
+
+            if (summary.recent_status) {
+                html += '<h5>最新状态</h5>';
+                if (summary.recent_status.blood_pressure) {
+                    const bp = summary.recent_status.blood_pressure;
+                    if (bp.count > 0) {
+                        html += `<p>血压: ${bp.latest?.systolic}/${bp.latest?.diastolic} mmHg - ${bp.status}</p>`;
+                    }
+                }
+                if (summary.recent_status.heart_rate) {
+                    const hr = summary.recent_status.heart_rate;
+                    if (hr.count > 0) {
+                        html += `<p>心率: ${hr.latest?.value} 次/分 - ${hr.status}</p>`;
+                    }
+                }
+                if (summary.recent_status.blood_sugar) {
+                    const bs = summary.recent_status.blood_sugar;
+                    if (bs.count > 0) {
+                        html += `<p>血糖: ${bs.latest?.value} mmol/L - ${bs.status}</p>`;
+                    }
+                }
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // 获取今日提醒
+        function getTodayReminders() {
+            const user_id = document.getElementById('adherence-user-id').value;
+
+            fetch(`/api/medication/today?user_id=${user_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const reminders = data.data;
+                        displayReminders(reminders);
+                        showResult('adherence-result', '今日提醒获取成功', true);
+                    } else {
+                        showResult('adherence-result', data.message, false);
+                    }
+                })
+                .catch(error => {
+                    showResult('adherence-result', '获取今日提醒失败', false);
+                });
+        }
+
+        // 获取所有提醒
+        function getUserReminders() {
+            const user_id = document.getElementById('adherence-user-id').value;
+
+            fetch(`/api/medication/reminders?user_id=${user_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const reminders = data.data;
+                        displayReminders(reminders);
+                        showResult('adherence-result', '提醒列表获取成功', true);
+                    } else {
+                        showResult('adherence-result', data.message, false);
+                    }
+                })
+                .catch(error => {
+                    showResult('adherence-result', '获取提醒列表失败', false);
+                });
+        }
+
+        // 生成依从性报告
+        function generateAdherenceReport() {
+            const user_id = document.getElementById('adherence-user-id').value;
+
+            fetch(`/api/medication/report?user_id=${user_id}&days=30`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const report = data.data;
+                        displayReport(report);
+                        showResult('adherence-result', '依从性报告生成成功', true);
+                    } else {
+                        showResult('adherence-result', data.message, false);
+                    }
+                })
+                .catch(error => {
+                    showResult('adherence-result', '生成依从性报告失败', false);
+                });
+        }
+
+        // 显示提醒列表
+        function displayReminders(reminders) {
+            const remindersList = document.getElementById('reminders-list');
+            remindersList.innerHTML = '';
+
+            if (reminders.length === 0) {
+                remindersList.innerHTML = '<p>暂无提醒</p>';
+                return;
+            }
+
+            reminders.forEach(reminder => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h4>${reminder.medication_name} <span class="status-badge status-${reminder.status}">${reminder.status}</span></h4>
+                    <p><strong>剂量:</strong> ${reminder.dosage}</p>
+                    <p><strong>频率:</strong> ${reminder.frequency}</p>
+                    <p><strong>用药时间:</strong> ${reminder.times.join(', ')}</p>
+                    <p><strong>开始日期:</strong> ${new Date(reminder.start_date).toLocaleDateString()}</p>
+                    ${reminder.end_date ? `<p><strong>结束日期:</strong> ${new Date(reminder.end_date).toLocaleDateString()}</p>` : ''}
+                    ${reminder.notes ? `<p><strong>备注:</strong> ${reminder.notes}</p>` : ''}
+                `;
+                remindersList.appendChild(card);
+            });
+        }
+
+        // 显示报告
+        function displayReport(report) {
+            const reportContent = document.getElementById('report-content');
+            reportContent.innerHTML = `
+                <div class="card">
+                    <h4>用药依从性报告</h4>
+                    <p><strong>统计周期:</strong> ${report.period}</p>
+                    <p><strong>总天数:</strong> ${report.total_days}天</p>
+                    <p><strong>总记录数:</strong> ${report.total_records}次</p>
+                    <p><strong>已服用:</strong> ${report.taken_records}次</p>
+                    <p><strong>错过:</strong> ${report.missed_records}次</p>
+                    <p><strong>跳过:</strong> ${report.skipped_records}次</p>
+                    <p><strong>依从率:</strong> ${report.adherence_rate}%</p>
+                    <p><strong>生成时间:</strong> ${new Date(report.generated_at).toLocaleString()}</p>
+                </div>
+            `;
+        }
+
+        // 字体大小控制
+        let currentFontSize = 16; // 默认字体大小
+        const minFontSize = 14;
+        const maxFontSize = 24;
+
+        document.getElementById('decrease-font').addEventListener('click', () => {
+            if (currentFontSize > minFontSize) {
+                currentFontSize -= 2;
+                document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+                localStorage.setItem('fontSize', currentFontSize);
+            }
+        });
+
+        document.getElementById('reset-font').addEventListener('click', () => {
+            currentFontSize = 16;
+            document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+            localStorage.setItem('fontSize', currentFontSize);
+        });
+
+        document.getElementById('increase-font').addEventListener('click', () => {
+            if (currentFontSize < maxFontSize) {
+                currentFontSize += 2;
+                document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+                localStorage.setItem('fontSize', currentFontSize);
+            }
+        });
+
+        // 加载保存的字体大小
+        const savedFontSize = localStorage.getItem('fontSize');
+        if (savedFontSize) {
+            currentFontSize = parseInt(savedFontSize);
+            document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+        }
+
+        // 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/static/service-worker.js')
+                    .then(function (registration) {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch(function (error) {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>
