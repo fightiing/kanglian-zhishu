@@ -8,11 +8,30 @@
 import logging
 import time
 import re
-import numpy as np
 from typing import List, Dict, Any, Optional
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-import jieba  # 中文分词
+
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except ImportError:
+    np = None
+    HAS_NUMPY = False
+
+try:
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    HAS_SKLEARN = True
+except ImportError:
+    TfidfVectorizer = None
+    cosine_similarity = None
+    HAS_SKLEARN = False
+
+try:
+    import jieba
+    HAS_JIEBA = True
+except ImportError:
+    jieba = None
+    HAS_JIEBA = False
 
 logger = logging.getLogger(__name__)
 
@@ -172,6 +191,11 @@ class OptimizedDoctorRecommendationSystem:
 
     def _initialize_optimization_components(self):
         """初始化优化组件"""
+        if not HAS_SKLEARN:
+            logger.warning("sklearn未安装，跳过向量化优化，使用降级匹配算法")
+            self.vectorizer = None
+            self.doctor_vectors = None
+            return
         try:
             # 初始化TF-IDF向量化器
             self.vectorizer = TfidfVectorizer(
@@ -414,7 +438,9 @@ class OptimizedDoctorRecommendationSystem:
 
         # 3. 经验权重（对数增长，避免过度影响）
         experience = doctor['experience']
-        score += min(np.log(experience + 1) * 8, 20)  # 上限20分
+        import math
+        log_val = math.log(experience + 1) if HAS_NUMPY is False else (np.log(experience + 1) if HAS_NUMPY else math.log(experience + 1))
+        score += min(log_val * 8, 20)  # 上限20分
 
         # 4. 距离权重（反比）
         distance = doctor['distance']
