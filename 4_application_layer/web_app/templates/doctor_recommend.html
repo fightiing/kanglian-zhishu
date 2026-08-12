@@ -1,0 +1,1327 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>医生推荐 - 老年医疗服务系统</title>
+    <!-- PWA 相关配置 -->
+    <meta name="theme-color" content="#8B6F47">
+    <meta name="description" content="医生推荐系统 - 根据症状推荐合适的医生">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/1.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="康联智枢">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-size-base: 18px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: url('/static/background.png') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            min-height: 100vh;
+            padding: 20px;
+            color: #5D4E37;
+            font-size: var(--font-size-base);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 248, 240, 0.85);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px 40px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(139, 111, 71, 0.15);
+            text-align: center;
+            border: 2px solid #F5EBE0;
+        }
+
+        .header h1 {
+            color: #8B6F47;
+            font-size: calc(var(--font-size-base) * 2.25);
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: #5D4E37;
+            text-decoration: none;
+            font-size: calc(var(--font-size-base) * 1.125);
+            font-weight: 600;
+            padding: 15px 28px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(139, 111, 71, 0.15);
+            border: 2px solid #C9A58C;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .nav-link:hover {
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            color: white;
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 111, 71, 0.4);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(139, 111, 71, 0.12);
+            margin-bottom: 25px;
+            border: 2px solid #F5EBE0;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(139, 111, 71, 0.2);
+        }
+
+        .input-section {
+            margin: 25px 0;
+        }
+
+        .input-label {
+            font-size: calc(var(--font-size-base) * 1.375);
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 18px;
+            font-size: calc(var(--font-size-base) * 1.25);
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: #fafbff;
+        }
+
+        .input-box:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .voice-input-btn {
+            font-size: calc(var(--font-size-base) * 1.125);
+            padding: 12px 28px;
+            background: #FF9800;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 12px;
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .voice-input-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4);
+        }
+
+        .search-btn {
+            width: 100%;
+            font-size: calc(var(--font-size-base) * 1.375);
+            padding: 20px;
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 25px;
+            box-shadow: 0 6px 18px rgba(139, 111, 71, 0.4);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(139, 111, 71, 0.5);
+        }
+
+        .doctor-list {
+            margin: 30px 0;
+            display: none;
+        }
+
+        .doctor-list.show {
+            display: block;
+        }
+
+        .doctor-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4CAF50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        }
+
+        .doctor-name {
+            font-size: calc(var(--font-size-base) * 1.625);
+            font-weight: 700;
+            color: #2E7D32;
+            margin-bottom: 12px;
+        }
+
+        .doctor-info {
+            font-size: calc(var(--font-size-base) * 1.25);
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .doctor-info-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .speak-result-btn {
+            font-size: calc(var(--font-size-base) * 1.125);
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .speak-result-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 35px;
+            font-size: calc(var(--font-size-base) * 1.375);
+            color: #667eea;
+            display: none;
+            font-weight: 500;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+
+            0%,
+            20% {
+                content: '.';
+            }
+
+            40% {
+                content: '..';
+            }
+
+            60%,
+            100% {
+                content: '...';
+            }
+        }
+
+        .empty-result {
+            text-align: center;
+            padding: 40px;
+            font-size: calc(var(--font-size-base) * 1.25);
+            color: #999;
+            display: none;
+        }
+
+        .empty-result.show {
+            display: block;
+        }
+
+        /* 新增样式：疾病匹配信息 */
+        .disease-info {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .disease-title {
+            font-size: calc(var(--font-size-base) * 1.375);
+            font-weight: 600;
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        .disease-item {
+            font-size: calc(var(--font-size-base) * 1.125);
+            margin: 5px 0;
+            color: #555;
+        }
+
+        /* 新增样式：冲突警告 */
+        .conflict-warning {
+            background: linear-gradient(135deg, #FFF3CD 0%, #FFECB3 100%);
+            border: 2px solid #FFC107;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-title {
+            font-size: calc(var(--font-size-base) * 1.375);
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .warning-item {
+            font-size: calc(var(--font-size-base) * 1.125);
+            margin: 8px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+        }
+
+        /* 新增样式：AI对话按钮 */
+        .ai-chat-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A24 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-chat-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.6);
+        }
+
+        .ai-chat-btn.pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* 新增样式：AI对话框 */
+        .ai-chat-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .ai-chat-modal.show {
+            display: flex;
+        }
+
+        .ai-chat-container {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            height: 80%;
+            max-height: 700px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .ai-chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-chat-title {
+            font-size: calc(var(--font-size-base) * 1.5);
+            font-weight: 700;
+        }
+
+        .ai-chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .ai-chat-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .ai-chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.ai {
+            justify-content: flex-start;
+        }
+
+        .message-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 15px;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            order: 2;
+        }
+
+        .message.ai .message-avatar {
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A24 100%);
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.ai .message-content {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 语音播报按钮样式 */
+        .speak-message-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: calc(var(--font-size-base) * 0.875);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .speak-message-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.5);
+        }
+
+        .speak-message-btn:active {
+            transform: translateY(0);
+        }
+
+        .ai-chat-input {
+            padding: 20px;
+            border-top: 2px solid #e0e0e0;
+            background: white;
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: calc(var(--font-size-base) * 1.125);
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .chat-send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: calc(var(--font-size-base) * 1.125);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .chat-send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .chat-quick-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .quick-question {
+            background: #f0f5ff;
+            border: 2px solid #667eea;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: calc(var(--font-size-base) * 1.0);
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-question:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 新增样式：AI增强分析区域 */
+        .ai-enhancement {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 5px solid #2196F3;
+            display: none;
+        }
+
+        .ai-enhancement.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ai-enhancement-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ai-enhancement-icon {
+            font-size: 32px;
+        }
+
+        .ai-enhancement-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1976D2;
+        }
+
+        .ai-enhancement-badge {
+            background: #2196F3;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .ai-enhancement-content {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .ai-enhancement-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .ai-action-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .ai-action-btn.primary {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+        }
+
+        .ai-action-btn.secondary {
+            background: white;
+            color: #2196F3;
+            border: 2px solid #2196F3;
+        }
+
+        .ai-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>医生推荐</h1>
+            <p style="font-size: 18px; color: #666; margin-top: 10px;">根据症状推荐合适的医生</p>
+
+            <!-- 字体大小控制 -->
+            <div style="display: flex; justify-content: center; margin-bottom: 20px; gap: 8px;">
+                <button id="decrease-font" class="btn"
+                    style="background: #f8f9fa; color: #5D4E37; border: 2px solid #C9A58C; padding: 6px 12px; font-size: 14px; width: 40px; text-align: center; border-radius: 6px;">A-</button>
+                <button id="reset-font" class="btn"
+                    style="background: #f8f9fa; color: #5D4E37; border: 2px solid #C9A58C; padding: 6px 12px; font-size: 14px; width: 40px; text-align: center; border-radius: 6px;">A</button>
+                <button id="increase-font" class="btn"
+                    style="background: #f8f9fa; color: #5D4E37; border: 2px solid #C9A58C; padding: 6px 12px; font-size: 14px; width: 40px; text-align: center; border-radius: 6px;">A+</button>
+            </div>
+
+            <!-- 导航栏 -->
+            <div class="nav-links">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/drug_recognize" class="nav-link">药品识别</a>
+                <a href="/voice_ask" class="nav-link">语音询问</a>
+                <a href="/doctor_recommend" class="nav-link active">医生推荐</a>
+                <a href="/health_record" class="nav-link">健康档案</a>
+                <a href="/graph" class="nav-link">知识图谱</a>
+            </div>
+        </div>
+
+        <!-- 主要功能区 -->
+        <div class="card">
+            <!-- 症状输入 -->
+            <div class="input-section">
+                <label class="input-label">请描述您的症状</label>
+                <input type="text" id="symptomInput" class="input-box" placeholder="例如: 心慌、胸闷、头晕">
+                <button class="voice-input-btn" onclick="voiceInputSymptom()">语音输入</button>
+            </div>
+
+            <!-- 搜索按钮 -->
+            <button class="search-btn" onclick="searchDoctors()">查找医生</button>
+
+            <!-- 加载提示 -->
+            <div id="loading" class="loading">正在查找合适的医生</div>
+
+            <!-- 空结果提示 -->
+            <div id="emptyResult" class="empty-result">
+                <p>😔 暂未找到合适的医生</p>
+                <p style="font-size: 18px; margin-top: 10px;">请尝试更换症状关键词</p>
+            </div>
+
+            <!-- 疾病匹配信息 -->
+            <div id="diseaseInfo" class="disease-info" style="display: none;">
+                <div class="disease-title">症状匹配结果</div>
+                <div class="disease-item"><strong>输入症状：</strong><span id="inputSymptom"></span></div>
+                <div class="disease-item"><strong>匹配疾病：</strong><span id="matchedDiseases"></span></div>
+                <div class="disease-item"><strong>推荐科室：</strong><span id="recommendedDepartments"></span></div>
+            </div>
+
+            <!-- AI增强分析区域 -->
+            <div id="aiEnhancement" class="ai-enhancement">
+                <div class="ai-enhancement-header">
+                    <div class="ai-enhancement-icon">AI</div>
+                    <div class="ai-enhancement-title">AI智能分析</div>
+                    <div class="ai-enhancement-badge">DeepSeek RAG</div>
+                </div>
+                <div class="ai-enhancement-content" id="aiContent">
+                    <!-- AI分析内容将在这里显示 -->
+                </div>
+                <div class="ai-enhancement-actions">
+                    <button class="ai-action-btn primary" onclick="speakAIAdvice()">语音播报</button>
+                    <button class="ai-action-btn secondary" onclick="copyAIAdvice()">复制建议</button>
+                </div>
+            </div>
+
+            <!-- 冲突警告 -->
+            <div id="conflictWarning" class="conflict-warning" style="display: none;">
+                <div class="warning-title">⚠️ 饮食冲突警告</div>
+                <div id="warningContent"></div>
+            </div>
+
+            <!-- 医生列表 -->
+            <div id="doctorList" class="doctor-list">
+                <h2 style="font-size: 28px; color: #8B6F47; margin-bottom: 20px; font-weight: 600;">推荐医生</h2>
+                <div id="doctorCards"></div>
+                <button class="speak-result-btn" onclick="speakRecommendation()">语音播报推荐结果</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI对话按钮 -->
+    <button class="ai-chat-btn pulse" onclick="openAIChat()">AI助手</button>
+
+    <!-- AI对话弹窗 -->
+    <div id="aiChatModal" class="ai-chat-modal">
+        <div class="ai-chat-container">
+            <div class="ai-chat-header">
+                <div class="ai-chat-title">AI医疗助手</div>
+                <button class="ai-chat-close" onclick="closeAIChat()">×</button>
+            </div>
+            <div class="ai-chat-messages" id="chatMessages">
+                <div class="message ai">
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content" style="padding-bottom: 40px;">
+                        您好！我是您的AI医疗助手，可以帮您分析症状、推荐医生、解答医疗问题。请问有什么可以帮您的？
+                        <button class="speak-message-btn"
+                            onclick="callTTS('您好！我是您的AI医疗助手，可以帮您分析症状、推荐医生、解答医疗问题。请问有什么可以帮您的？')">播报</button>
+                    </div>
+                </div>
+            </div>
+            <div class="ai-chat-input">
+                <div class="chat-quick-questions">
+                    <div class="quick-question" onclick="askQuickQuestion('高血压患者应该注意什么？')">高血压注意事项</div>
+                    <div class="quick-question" onclick="askQuickQuestion('糖尿病饮食建议')">糖尿病饮食建议</div>
+                    <div class="quick-question" onclick="askQuickQuestion('感冒了怎么办？')">感冒了怎么办</div>
+                    <div class="quick-question" onclick="askQuickQuestion('心慌胸闷应该看哪个科室？')">心慌胸闷看什么科</div>
+                </div>
+                <div class="chat-input-group">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="请输入您的问题..."
+                        onkeypress="handleChatEnter(event)">
+                    <button class="chat-send-btn" onclick="sendMessage()" id="sendBtn">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDoctors = [];
+        let currentResultData = null;
+        let aiAdviceText = '';
+        let audioElement = null; // 全局音频对象
+
+        // AI对话功能
+        function openAIChat() {
+            document.getElementById('aiChatModal').classList.add('show');
+            document.getElementById('chatInput').focus();
+        }
+
+        function closeAIChat() {
+            // 停止音频播放
+            if (audioElement) {
+                audioElement.pause();
+                audioElement = null;
+            }
+            document.getElementById('aiChatModal').classList.remove('show');
+        }
+
+        function handleChatEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function askQuickQuestion(question) {
+            document.getElementById('chatInput').value = question;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // 添加用户消息
+            addMessage(message, 'user');
+            input.value = '';
+
+            // 禁用发送按钮
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = '思考中...';
+
+            try {
+                // 调用AI接口
+                const response = await fetch('/api/deepseek/consult', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: message })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    addMessage(result.data.answer, 'ai');
+                } else {
+                    addMessage('抱歉，我暂时无法回答这个问题。请稍后再试。', 'ai');
+                }
+            } catch (error) {
+                addMessage('网络连接出现问题，请检查网络后重试。', 'ai');
+            } finally {
+                // 重新启用发送按钮
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送';
+                input.focus();
+            }
+        }
+
+        function addMessage(content, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = sender === 'user' ? '您' : 'AI';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+
+            // 为AI消息添加语音播报按钮
+            if (sender === 'ai') {
+                const speakBtn = document.createElement('button');
+                speakBtn.className = 'speak-message-btn';
+                speakBtn.innerHTML = '播报';
+                speakBtn.onclick = function () {
+                    // 获取纯文本内容（移除HTML标签）
+                    const textContent = contentDiv.textContent || contentDiv.innerText;
+                    callTTS(textContent.trim());
+                };
+                contentDiv.appendChild(speakBtn);
+                // 为内容添加内边距，避免按钮遮挡文字
+                contentDiv.style.paddingBottom = '40px';
+            }
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(messageDiv);
+
+            // 滚动到底部
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 语音输入症状
+        async function voiceInputSymptom() {
+            try {
+                // 请求麦克风权限
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaRecorder = new MediaRecorder(stream);
+                const audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = async () => {
+                        const audioBase64 = reader.result.split(',')[1];
+
+                        try {
+                            const response = await fetch('/api/voice/ask', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ audio: audioBase64 })
+                            });
+
+                            const result = await response.json();
+                            if (result.success) {
+                                document.getElementById('symptomInput').value = result.data.transcript;
+                            } else {
+                                alert('语音识别失败: ' + result.message);
+                            }
+                        } catch (error) {
+                            alert('语音识别服务异常: ' + error.message);
+                        }
+                    };
+
+                    reader.readAsDataURL(audioBlob);
+                };
+
+                mediaRecorder.start();
+                document.getElementById('symptomInput').placeholder = '正在录音...3秒后自动停止';
+
+                setTimeout(() => {
+                    if (mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop();
+                        stream.getTracks().forEach(track => track.stop());
+                        document.getElementById('symptomInput').placeholder = '例如: 心慌、胸闷、头晕';
+                    }
+                }, 3000);
+
+            } catch (error) {
+                alert('麦克风调用失败: ' + error.message);
+            }
+        }
+
+        // 搜索医生
+        async function searchDoctors() {
+            const symptom = document.getElementById('symptomInput').value.trim();
+
+            if (!symptom) {
+                alert('请输入症状描述');
+                return;
+            }
+
+            // 显示加载状态
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('doctorList').classList.remove('show');
+            document.getElementById('emptyResult').classList.remove('show');
+            document.getElementById('diseaseInfo').style.display = 'none';
+            document.getElementById('conflictWarning').style.display = 'none';
+            document.getElementById('aiEnhancement').classList.remove('show');
+
+            try {
+                const response = await fetch('/api/doctor/recommend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        symptom: symptom,
+                        use_ai: true
+                    })
+                });
+
+                const result = await response.json();
+                document.getElementById('loading').classList.remove('show');
+
+                if (result.success) {
+                    currentResultData = result.data;
+                    displayResult(result.data);
+                } else {
+                    document.getElementById('emptyResult').classList.add('show');
+                    alert('查询失败: ' + result.message);
+                }
+            } catch (error) {
+                document.getElementById('loading').classList.remove('show');
+                alert('网络错误，请检查连接: ' + error.message);
+            }
+        }
+
+        // 显示结果
+        function displayResult(data) {
+            // 显示疾病匹配信息
+            if (data.matched_diseases && data.matched_diseases.length > 0) {
+                document.getElementById('inputSymptom').textContent = data.symptom;
+                document.getElementById('matchedDiseases').textContent = data.matched_diseases.join('、');
+                document.getElementById('recommendedDepartments').textContent = data.recommended_departments.join('、');
+                document.getElementById('diseaseInfo').style.display = 'block';
+            }
+
+            // 显示AI增强分析
+            if (data.ai_enhancement && data.ai_enhancement.enabled && data.ai_enhancement.advice) {
+                displayAIAdvice(data.ai_enhancement.advice);
+            }
+
+            // 显示医生列表
+            if (data.doctors && data.doctors.length > 0) {
+                displayDoctors(data.doctors);
+                document.getElementById('doctorList').classList.add('show');
+            } else {
+                document.getElementById('emptyResult').classList.add('show');
+            }
+
+            // 显示冲突警告
+            if (data.conflicts && data.conflicts.length > 0) {
+                displayConflictWarning(data.conflicts);
+            }
+        }
+
+        // 显示AI建议
+        function displayAIAdvice(advice) {
+            aiAdviceText = advice;
+            document.getElementById('aiContent').innerHTML = advice.replace(/\n/g, '<br>');
+            document.getElementById('aiEnhancement').classList.add('show');
+        }
+
+        // 显示医生列表
+        function displayDoctors(doctors) {
+            currentDoctors = doctors;
+            const cardsContainer = document.getElementById('doctorCards');
+            cardsContainer.innerHTML = '';
+
+            doctors.forEach((doctor, index) => {
+                const card = document.createElement('div');
+                card.className = 'doctor-card';
+                card.innerHTML = `
+                    <div class="doctor-name">${index + 1}. ${doctor.name}</div>
+                    <div class="doctor-info">
+                        <span class="doctor-info-label">科室：</span>${doctor.department}
+                    </div>
+                    <div class="doctor-info">
+                        <span class="doctor-info-label">距离：</span>${doctor.distance}
+                    </div>
+                    <div class="doctor-info">
+                        <span class="doctor-info-label">出诊时间：</span>${doctor.schedule}
+                    </div>
+                    <div class="doctor-info">
+                        <span class="doctor-info-label">匹配度：</span>
+                        <span style="color: ${doctor.matchScore >= 80 ? '#4CAF50' : doctor.matchScore >= 60 ? '#FF9800' : '#F44336'};
+                                     font-weight: bold;">
+                            ${doctor.matchScore}%
+                        </span>
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        // 显示冲突警告
+        function displayConflictWarning(conflicts) {
+            const warningContent = document.getElementById('warningContent');
+            warningContent.innerHTML = '';
+
+            conflicts.forEach(conflict => {
+                const warningItem = document.createElement('div');
+                warningItem.className = 'warning-item';
+                warningItem.innerHTML = `
+                    <strong>${conflict.疾病A}</strong> 与 <strong>${conflict.疾病B}</strong> 存在饮食冲突：
+                    ${conflict.冲突食物.join('、')}
+                `;
+                warningContent.appendChild(warningItem);
+            });
+
+            document.getElementById('conflictWarning').style.display = 'block';
+        }
+
+        // AI建议功能
+        async function speakAIAdvice() {
+            if (!aiAdviceText) {
+                alert('暂无AI建议可播报');
+                return;
+            }
+            await callTTS(aiAdviceText);
+        }
+
+        function copyAIAdvice() {
+            if (!aiAdviceText) {
+                alert('暂无AI建议可复制');
+                return;
+            }
+
+            navigator.clipboard.writeText(aiAdviceText).then(() => {
+                alert('AI建议已复制到剪贴板');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                alert('复制失败，请手动复制');
+            });
+        }
+
+        // 语音播报推荐结果
+        async function speakRecommendation() {
+            if (!currentResultData) {
+                alert('暂无推荐结果可播报');
+                return;
+            }
+
+            let text = '为您推荐医生信息：';
+
+            if (currentResultData.matched_diseases && currentResultData.matched_diseases.length > 0) {
+                text += `根据症状【${currentResultData.symptom}】匹配到疾病：${currentResultData.matched_diseases.join('、')}。`;
+                text += `推荐就诊科室：${currentResultData.recommended_departments.join('、')}。`;
+            }
+
+            if (currentResultData.doctors && currentResultData.doctors.length > 0) {
+                const topDoctors = currentResultData.doctors.slice(0, 3);
+                text += `为您推荐${topDoctors.length}位医生：`;
+
+                topDoctors.forEach((doctor, index) => {
+                    text += `第${index + 1}位，${doctor.name}医生，${doctor.department}，`;
+                    text += `距离${doctor.distance}，${doctor.schedule}，匹配度${doctor.matchScore}%。`;
+                });
+            }
+
+            if (currentResultData.conflicts && currentResultData.conflicts.length > 0) {
+                text += '请注意以下饮食冲突：';
+                currentResultData.conflicts.forEach(conflict => {
+                    text += `${conflict.疾病A}与${conflict.疾病B}在${conflict.冲突食物.join('、')}方面存在冲突。`;
+                });
+            }
+
+            await callTTS(text);
+        }
+
+        // 通用TTS调用方法
+        async function callTTS(text) {
+            try {
+                // 停止之前的音频
+                if (audioElement) {
+                    audioElement.pause();
+                    audioElement = null;
+                }
+
+                // 首先尝试使用Web Speech API（浏览器自带）
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); // 取消之前的播报
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'zh-CN'; // 设置为中文
+                    utterance.rate = 0.9; // 语速稍慢，适合老年人
+                    utterance.pitch = 1.0;
+                    window.speechSynthesis.speak(utterance);
+                    return;
+                }
+
+                // 如果Web Speech API不可用，尝试使用后端TTS
+                const response = await fetch('/api/common/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const result = await response.json();
+                if (result.success && result.audio) {
+                    audioElement = new Audio('data:audio/mp3;base64,' + result.audio);
+                    audioElement.play();
+                } else {
+                    // 如果后端TTS也失败，提示用户
+                    alert('语音播报功能暂时不可用，请查看文字内容');
+                }
+            } catch (error) {
+                console.error('TTS调用失败:', error);
+                // 不弹窗，避免打扰用户
+            }
+        }
+
+        // 在HTML文件中添加
+        async function askNeo4jAI(question) {
+            try {
+                const response = await fetch('/api/neo4j-ai/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
+
+                const result = await response.json();
+                return result;
+
+            } catch (error) {
+                console.error('AI问答失败:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // 使用示例
+        async function handleMedicalQuestion() {
+            const question = document.getElementById('aiQuestionInput').value;
+
+            if (!question) {
+                alert('请输入问题');
+                return;
+            }
+
+            const result = await askNeo4jAI(question);
+
+            if (result.success) {
+                // 显示结果
+                document.getElementById('aiAnswer').innerHTML = `
+                    <div class="ai-answer">
+                        <h3>AI回答（基于知识图谱）:</h3>
+                        <p>${result.answer}</p>
+                    </div>
+                `;
+            } else {
+                alert('回答失败: ' + result.message);
+            }
+        }
+
+        // 支持回车键搜索
+        document.getElementById('symptomInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchDoctors();
+            }
+        });
+
+        // 字体大小控制
+        let currentFontSize = 18; // 默认字体大小
+        const minFontSize = 14;
+        const maxFontSize = 24;
+
+        document.getElementById('decrease-font').addEventListener('click', () => {
+            if (currentFontSize > minFontSize) {
+                currentFontSize -= 2;
+                document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+                localStorage.setItem('fontSize', currentFontSize);
+            }
+        });
+
+        document.getElementById('reset-font').addEventListener('click', () => {
+            currentFontSize = 18;
+            document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+            localStorage.setItem('fontSize', currentFontSize);
+        });
+
+        document.getElementById('increase-font').addEventListener('click', () => {
+            if (currentFontSize < maxFontSize) {
+                currentFontSize += 2;
+                document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+                localStorage.setItem('fontSize', currentFontSize);
+            }
+        });
+
+        // 加载保存的字体大小
+        const savedFontSize = localStorage.getItem('fontSize');
+        if (savedFontSize) {
+            currentFontSize = parseInt(savedFontSize);
+            document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+        }
+
+        // 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/static/service-worker.js')
+                    .then(function (registration) {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch(function (error) {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>
