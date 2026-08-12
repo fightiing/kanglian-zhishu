@@ -1,0 +1,13 @@
+Flask==3.1.2
+flask-cors==6.0.2
+py2neo>=2021.2.3
+requests>=2.31.0
+baidu-aip==4.16.13
+numpy>=1.24.3
+scipy>=1.11.4
+soundfile
+langchain>=0.1.0
+langchain-community>=0.0.10
+neo4j>=5.0.0
+jieba>=0.42.1
+Pillow>=10.0.0
