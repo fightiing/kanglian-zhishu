@@ -1,0 +1,1254 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>药品识别 - 老年医疗服务系统</title>
+    <!-- PWA 相关配置 -->
+    <meta name="theme-color" content="#8B6F47">
+    <meta name="description" content="药品识别系统 - 拍照识别药品信息，智能解析说明书">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/1.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="康联智枢">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-size-base: 18px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: url('/static/background.png') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            min-height: 100vh;
+            padding: 20px;
+            color: #5D4E37;
+            font-size: var(--font-size-base);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 248, 240, 0.85);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px 40px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(139, 111, 71, 0.15);
+            border: 2px solid #F5EBE0;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #8B6F47;
+            font-size: calc(var(--font-size-base) * 2.25);
+            margin-bottom: 10px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* 导航栏 */
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: #5D4E37;
+            text-decoration: none;
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(139, 111, 71, 0.15);
+            border: 2px solid #C9A58C;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .nav-link:hover {
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            color: white;
+        }
+
+        /* 主要内容区域 - 左右布局 */
+        .main-content {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        /* 左侧卡片 - 图片上传区域 */
+        .left-card {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(139, 111, 71, 0.12);
+            border: 2px solid #F5EBE0;
+            transition: all 0.3s ease;
+            min-width: 400px;
+        }
+
+        .left-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(139, 111, 71, 0.2);
+        }
+
+        /* 右侧卡片 - 识别结果区域 */
+        .right-card {
+            flex: 1.5;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(139, 111, 71, 0.12);
+            border: 2px solid #F5EBE0;
+            display: flex;
+            flex-direction: column;
+            min-width: 500px;
+            max-height: 700px;
+        }
+
+        /* 摄像头拍照区域 */
+        .camera-section {
+            text-align: center;
+            margin: 20px 0 30px;
+        }
+
+        .camera-btn {
+            width: 140px;
+            height: 140px;
+            font-size: 60px;
+            background: linear-gradient(135deg, #C9A58C 0%, #8B6F47 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(139, 111, 71, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .camera-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(139, 111, 71, 0.5);
+        }
+
+        .camera-hint {
+            font-size: calc(var(--font-size-base) * 1.25);
+            color: #666;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 111, 71, 0.4);
+        }
+
+        /* 上传按钮 */
+        .upload-btn {
+            font-size: calc(var(--font-size-base) * 1.125);
+            padding: 15px 35px;
+            background: #FF9800;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(255, 152, 0, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px auto 0;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(255, 152, 0, 0.4);
+        }
+
+        /* 预览区域 */
+        .preview-area {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .preview-area.show {
+            display: block;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            border: 3px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        /* 识别按钮 */
+        .recognize-btn {
+            font-size: calc(var(--font-size-base) * 1.25);
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .recognize-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+        }
+
+        /* 加载提示 */
+        .loading {
+            text-align: center;
+            padding: 25px;
+            font-size: calc(var(--font-size-base) * 1.125);
+            color: #667eea;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+
+            0%,
+            20% {
+                content: '.';
+            }
+
+            40% {
+                content: '..';
+            }
+
+            60%,
+            100% {
+                content: '...';
+            }
+        }
+
+        /* 右侧结果区域标题 */
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        .result-header h2 {
+            color: #2E7D32;
+            font-size: calc(var(--font-size-base) * 1.625);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-header h2::before {
+            content: "✅";
+            font-size: calc(var(--font-size-base) * 1.5);
+        }
+
+        /* 结果内容区域 - 可滚动 */
+        .result-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* 自定义滚动条 */
+        .result-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .result-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .result-content::-webkit-scrollbar-thumb {
+            background: #4CAF50;
+            border-radius: 4px;
+        }
+
+        .result-content::-webkit-scrollbar-thumb:hover {
+            background: #388E3C;
+        }
+
+        /* 主要信息卡片 */
+        .main-info-card {
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4CAF50;
+        }
+
+        .drug-name {
+            font-size: calc(var(--font-size-base) * 1.625);
+            color: #1B5E20;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(46, 125, 50, 0.3);
+        }
+
+        .main-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid #C8E6C9;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #2E7D32;
+            margin-bottom: 8px;
+            font-size: var(--font-size-base);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: var(--font-size-base);
+            line-height: 1.5;
+            min-height: 20px;
+            white-space: pre-wrap;
+            /* 关键：保留换行和空格 */
+            word-wrap: break-word;
+        }
+
+        /* 结构化信息网格 */
+        .structured-section {
+            margin-top: 25px;
+        }
+
+        .section-title {
+            color: #1B5E20;
+            font-size: calc(var(--font-size-base) * 1.25);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: "📋";
+            font-size: calc(var(--font-size-base) * 1.125);
+        }
+
+        .structured-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .structured-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #C8E6C9;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .structured-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .structured-key {
+            font-weight: 600;
+            color: #2E7D32;
+            margin-bottom: 8px;
+            font-size: var(--font-size-base);
+            padding-bottom: 5px;
+            border-bottom: 1px solid #E8F5E9;
+        }
+
+        .structured-value {
+            color: #444;
+            font-size: calc(var(--font-size-base) * 0.9375);
+            line-height: 1.5;
+            max-height: 120px;
+            overflow-y: auto;
+            padding-right: 5px;
+            white-space: pre-wrap;
+            /* 关键：保留换行和空格 */
+            word-wrap: break-word;
+        }
+
+        .structured-value::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .structured-value::-webkit-scrollbar-thumb {
+            background: #90CAF9;
+            border-radius: 3px;
+        }
+
+        /* 详细信息区域 */
+        .detail-section {
+            margin-top: 25px;
+            background: #F9F9F9;
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .detail-header h3 {
+            color: #1565C0;
+            font-size: calc(var(--font-size-base) * 1.125);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: calc(var(--font-size-base) * 0.875);
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .detail-content {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .detail-content.show {
+            display: block;
+        }
+
+        .text-container {
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: calc(var(--font-size-base) * 0.875);
+            line-height: 1.4;
+            color: #666;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #E0E0E0;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            /* 关键：保留换行和空格 */
+            word-wrap: break-word;
+        }
+
+        .text-container pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .text-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .text-container::-webkit-scrollbar-thumb {
+            background: #BDBDBD;
+            border-radius: 3px;
+        }
+
+        /* 格式化的文本样式 */
+        .formatted-text {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        .formatted-text .section-title {
+            color: #1565C0;
+            font-weight: 600;
+            margin: 10px 0 5px 0;
+            font-size: 16px;
+        }
+
+        .formatted-text .content {
+            color: #333;
+            margin-left: 10px;
+            padding-left: 10px;
+            border-left: 2px solid #E0E0E0;
+        }
+
+        /* 语音播报按钮 */
+        .voice-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            border-radius: 50%;
+            border: none;
+            font-size: 40px;
+            color: white;
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+            z-index: 1000;
+        }
+
+        .voice-btn.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 28px rgba(33, 150, 243, 0.6);
+        }
+
+        /* 状态标签 */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge-success {
+            background: #C8E6C9;
+            color: #1B5E20;
+        }
+
+        .badge-info {
+            background: #BBDEFB;
+            color: #1565C0;
+        }
+
+        /* 图标样式 */
+        .icon {
+            font-size: 20px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .left-card,
+            .right-card {
+                min-width: auto;
+            }
+
+            .structured-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-link {
+                width: 200px;
+            }
+
+            .main-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .structured-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>药品识别系统</h1>
+            <p style="font-size: 16px; color: #666; margin-top: 8px;">拍照识别药品信息，智能解析说明书</p>
+
+            <!-- 字体大小控制 -->
+            <div style="display: flex; justify-content: center; margin-bottom: 20px; gap: 8px;">
+                <button id="decrease-font" class="btn"
+                    style="background: #f8f9fa; color: #5D4E37; border: 2px solid #C9A58C; padding: 6px 12px; font-size: 14px; width: 40px; text-align: center; border-radius: 6px;">A-</button>
+                <button id="reset-font" class="btn"
+                    style="background: #f8f9fa; color: #5D4E37; border: 2px solid #C9A58C; padding: 6px 12px; font-size: 14px; width: 40px; text-align: center; border-radius: 6px;">A</button>
+                <button id="increase-font" class="btn"
+                    style="background: #f8f9fa; color: #5D4E37; border: 2px solid #C9A58C; padding: 6px 12px; font-size: 14px; width: 40px; text-align: center; border-radius: 6px;">A+</button>
+            </div>
+
+            <!-- 导航栏 -->
+            <div class="nav-links">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/drug_recognize" class="nav-link active">药品识别</a>
+                <a href="/voice_ask" class="nav-link">语音询问</a>
+                <a href="/doctor_recommend" class="nav-link">医生推荐</a>
+                <a href="/health_record" class="nav-link">健康档案</a>
+                <a href="/graph" class="nav-link">知识图谱</a>
+            </div>
+        </div>
+
+        <!-- 主要内容区域 - 左右布局 -->
+        <div class="main-content">
+            <!-- 左侧卡片 - 图片上传区域 -->
+            <div class="left-card">
+                <!-- 摄像头拍照 -->
+                <div class="camera-section">
+                    <button class="camera-btn" onclick="openCamera()">📷</button>
+                    <p class="camera-hint">点击拍摄药品包装</p>
+                </div>
+
+                <!-- 相册上传 -->
+                <div style="text-align: center;">
+                    <input type="file" id="uploadInput" accept="image/*" style="display: none;"
+                        onchange="handleUpload(event)">
+                    <button class="upload-btn" onclick="document.getElementById('uploadInput').click()">
+                        <span class="icon">📁</span> 从相册选择照片
+                    </button>
+                    <p style="font-size: 14px; color: #999; margin-top: 10px;">支持 JPG、PNG、WEBP 格式</p>
+                </div>
+
+                <!-- 照片预览区 -->
+                <div id="previewArea" class="preview-area">
+                    <img id="previewImg" class="preview-img" src="" alt="预览图片">
+                    <div>
+                        <button class="recognize-btn" onclick="recognizeDrug()">🔍 开始识别</button>
+                    </div>
+                </div>
+
+                <!-- 加载提示 -->
+                <div id="loading" class="loading">正在识别药品信息...</div>
+            </div>
+
+            <!-- 右侧卡片 - 识别结果区域 -->
+            <div class="right-card">
+                <div class="result-header">
+                    <h2>识别结果</h2>
+                </div>
+
+                <div class="result-content" id="resultContent">
+                    <!-- 默认提示 -->
+                    <div id="defaultPrompt" style="text-align: center; padding: 60px 20px; color: #999;">
+                        <div style="font-size: 80px; margin-bottom: 20px;">📷</div>
+                        <h3 style="color: #666; margin-bottom: 15px;">请上传药品图片</h3>
+                        <p style="font-size: 16px;">拍照或从相册选择药品说明书图片<br>系统将自动识别并提取药品信息</p>
+                    </div>
+
+                    <!-- 识别结果内容（动态生成） -->
+                    <div id="resultDisplay" style="display: none;">
+                        <!-- 主要信息卡片 -->
+                        <div class="main-info-card">
+                            <div class="drug-name" id="drugNameDisplay">-</div>
+
+                            <div class="main-info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <span class="icon">📏</span> 规格
+                                    </div>
+                                    <div class="info-value" id="drugSpecDisplay">-</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <span class="icon">💊</span> 用法用量
+                                    </div>
+                                    <div class="info-value" id="drugUsageDisplay">-</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <span class="icon">⚠️</span> 不良反应
+                                    </div>
+                                    <div class="info-value" id="drugSideEffectDisplay">-</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <span class="icon">🚫</span> 禁忌
+                                    </div>
+                                    <div class="info-value" id="drugContraDisplay">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 结构化信息 -->
+                        <div class="structured-section">
+                            <div class="section-title">药品详细信息</div>
+                            <div id="structuredContent" class="structured-grid">
+                                <!-- 这里会动态生成结构化信息 -->
+                            </div>
+                        </div>
+
+                        <!-- 详细信息区域 -->
+                        <div class="detail-section">
+                            <div class="detail-header">
+                                <h3><span class="icon">📝</span> 完整说明书文本</h3>
+                                <button class="toggle-btn" onclick="toggleText('fullText')">展开</button>
+                            </div>
+                            <div id="fullText" class="detail-content">
+                                <div id="fullTextContent" class="text-container formatted-text">
+                                    <!-- 这里显示完整文本 -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <div class="detail-header">
+                                <h3><span class="icon">🔤</span> 原始OCR文本</h3>
+                                <button class="toggle-btn" onclick="toggleText('rawText')">展开</button>
+                            </div>
+                            <div id="rawText" class="detail-content">
+                                <div id="rawTextContent" class="text-container formatted-text">
+                                    <!-- 这里显示原始OCR文本 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 语音播报按钮 -->
+        <button id="voiceBtn" class="voice-btn" onclick="speakResult()">🔊</button>
+    </div>
+
+    <script>
+        let currentImageData = null;
+        let currentResult = null;
+        let currentFileName = 'drug_image.jpg';
+
+        // 打开摄像头
+        async function openCamera() {
+            try {
+                const constraints = {
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                };
+
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+                const video = document.createElement('video');
+                video.style.width = '100%';
+                video.style.maxWidth = '100%';
+                video.style.borderRadius = '12px';
+                video.autoplay = true;
+                video.srcObject = stream;
+
+                const captureBtn = document.createElement('button');
+                captureBtn.textContent = '拍照识别';
+                captureBtn.className = 'recognize-btn';
+                captureBtn.style.marginTop = '15px';
+
+                const previewArea = document.getElementById('previewArea');
+                previewArea.innerHTML = '';
+                previewArea.appendChild(video);
+                previewArea.appendChild(captureBtn);
+                previewArea.classList.add('show');
+
+                captureBtn.onclick = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0);
+
+                    currentImageData = canvas.toDataURL('image/jpeg');
+                    stream.getTracks().forEach(track => track.stop());
+
+                    document.getElementById('previewImg').src = currentImageData;
+                    previewArea.innerHTML = `
+                        <img id="previewImg" class="preview-img" src="${currentImageData}" alt="预览图片">
+                        <div><button class="recognize-btn" onclick="recognizeDrug()">🔍 开始识别</button></div>
+                    `;
+                };
+
+            } catch (error) {
+                alert('摄像头调用失败，请检查权限设置或使用相册上传功能\n\n错误信息：' + error.message);
+            }
+        }
+
+        // 处理相册上传
+        function handleUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 保存原始文件名
+            currentFileName = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                currentImageData = e.target.result;
+                document.getElementById('previewImg').src = currentImageData;
+                document.getElementById('previewArea').classList.add('show');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 识别药品
+        async function recognizeDrug() {
+            if (!currentImageData) {
+                alert('请先拍照或上传图片');
+                return;
+            }
+
+            // 显示加载状态
+            document.getElementById('loading').classList.add('show');
+
+            try {
+                // 将Base64转为Blob
+                const base64Data = currentImageData.split(',')[1];
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'image/jpeg' });
+
+                // 创建FormData，使用原始文件名
+                const formData = new FormData();
+                formData.append('file', blob, currentFileName);
+
+                // 调用后端识别接口
+                const response = await fetch('/api/drug/recognize', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                document.getElementById('loading').classList.remove('show');
+
+                if (result.success) {
+                    displayResult(result.data);
+                } else {
+                    alert('识别失败：' + result.message);
+                }
+            } catch (error) {
+                document.getElementById('loading').classList.remove('show');
+                alert('识别出错，请检查网络连接或重试\n\n错误：' + error.message);
+            }
+        }
+
+        // 安全提取值的辅助函数
+        function safeExtract(structuredText, possibleKeys) {
+            if (!structuredText || typeof structuredText !== 'object') {
+                return '';
+            }
+
+            for (const key of possibleKeys) {
+                const value = structuredText[key];
+                if (value && typeof value === 'string' && value.trim() !== '') {
+                    return value.trim();
+                }
+            }
+            return '';
+        }
+
+        // 格式化对象值的辅助函数
+        function formatObjectValue(obj) {
+            if (!obj || typeof obj !== 'object') {
+                return '';
+            }
+
+            const result = [];
+            for (const [subKey, subValue] of Object.entries(obj)) {
+                if (subValue && typeof subValue === 'string' && subValue.trim() !== '') {
+                    result.push(`${subKey}: ${subValue.trim()}`);
+                }
+            }
+
+            return result.length > 0 ? result.join('<br>') : '';
+        }
+
+        // 格式化文本，保持换行和段落
+        function formatText(text) {
+            if (!text || typeof text !== 'string') {
+                return '';
+            }
+
+            // 替换多个换行为HTML换行符
+            return text
+                .replace(/\r\n/g, '\n')
+                .replace(/\r/g, '\n')
+                .split('\n')
+                .map(line => {
+                    line = line.trim();
+                    // 如果行以【开头】结尾，添加额外样式
+                    if (line.startsWith('【') && line.endsWith('】')) {
+                        return `<div class="section-title">${line}</div>`;
+                    }
+                    // 如果是数字开头的内容（如：1. 2. 3.）
+                    if (/^\d+\./.test(line)) {
+                        return `<div class="content">${line}</div>`;
+                    }
+                    // 普通内容
+                    return `<div class="content">${line}</div>`;
+                })
+                .join('');
+        }
+
+        // 显示识别结果
+        function displayResult(data) {
+            currentResult = data;
+            console.log('识别结果数据:', data); // 调试用
+
+            // 隐藏默认提示，显示结果
+            document.getElementById('defaultPrompt').style.display = 'none';
+            document.getElementById('resultDisplay').style.display = 'block';
+
+            // 药品名称
+            const drugName = data.drug_name || data.name || '未识别';
+            document.getElementById('drugNameDisplay').textContent = drugName;
+
+            // 提取主要信息
+            const structuredText = data.structured_text || {};
+
+            // 规格
+            const spec = safeExtract(structuredText, ['规格', '包装', '成分']);
+            document.getElementById('drugSpecDisplay').textContent = spec || '未识别';
+
+            // 用法用量
+            const usage = safeExtract(structuredText, ['用法用量', '用法', '用量']);
+            document.getElementById('drugUsageDisplay').textContent = usage || '未识别';
+
+            // 不良反应
+            const sideEffect = safeExtract(structuredText, ['不良反应', '副作用']);
+            document.getElementById('drugSideEffectDisplay').textContent = sideEffect || '未识别';
+
+            // 禁忌
+            const contra = safeExtract(structuredText, ['禁忌', '注意事项']);
+            document.getElementById('drugContraDisplay').textContent = contra || '未识别';
+
+            // 更新结构化信息
+            updateStructuredContent(data);
+
+            // 更新完整文本 - 使用格式化显示
+            const fullTextElement = document.getElementById('fullTextContent');
+            if (data.full_text && typeof data.full_text === 'string' && data.full_text.trim() !== '') {
+                fullTextElement.innerHTML = formatText(data.full_text);
+                console.log('完整文本:', data.full_text); // 调试用
+            } else {
+                fullTextElement.innerHTML = '<div class="content">暂无完整文本信息</div>';
+            }
+
+            // 更新原始OCR文本 - 使用格式化显示
+            const rawTextElement = document.getElementById('rawTextContent');
+            if (data.raw_ocr_text && typeof data.raw_ocr_text === 'string' && data.raw_ocr_text.trim() !== '') {
+                rawTextElement.innerHTML = formatText(data.raw_ocr_text);
+                console.log('原始OCR文本:', data.raw_ocr_text); // 调试用
+            } else {
+                rawTextElement.innerHTML = '<div class="content">暂无原始OCR文本</div>';
+            }
+
+            // 显示语音播报按钮
+            document.getElementById('voiceBtn').classList.add('show');
+        }
+
+        // 更新结构化信息
+        function updateStructuredContent(data) {
+            const structuredContent = document.getElementById('structuredContent');
+            structuredContent.innerHTML = '';
+
+            if (data.structured_text && Object.keys(data.structured_text).length > 0) {
+                // 排除已经显示的主要信息字段
+                const excludedKeys = ['规格', '包装', '成分', '用法用量', '用法', '用量', '不良反应', '副作用', '禁忌', '注意事项'];
+
+                for (const [key, value] of Object.entries(data.structured_text)) {
+                    // 跳过已显示的和空值
+                    if (excludedKeys.includes(key) || value === null || value === undefined || value === '') {
+                        continue;
+                    }
+
+                    let displayValue = '';
+
+                    // 处理不同类型的值
+                    if (typeof value === 'string') {
+                        displayValue = value.trim();
+                    } else if (typeof value === 'object') {
+                        // 处理对象类型的值
+                        displayValue = formatObjectValue(value);
+                    } else {
+                        displayValue = String(value);
+                    }
+
+                    // 只显示有内容的项
+                    if (displayValue && displayValue !== '') {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'structured-item';
+
+                        // 对于长文本，添加最大高度和滚动
+                        const valueDiv = document.createElement('div');
+                        valueDiv.className = 'structured-value';
+
+                        // 如果是包含换行的文本，保留换行
+                        if (typeof value === 'string' && value.includes('\n')) {
+                            valueDiv.innerHTML = value.replace(/\n/g, '<br>');
+                        } else {
+                            valueDiv.textContent = displayValue;
+                        }
+
+                        itemDiv.innerHTML = `
+                            <div class="structured-key">${key}</div>
+                        `;
+                        itemDiv.appendChild(valueDiv);
+                        structuredContent.appendChild(itemDiv);
+                    }
+                }
+
+                // 如果没有任何有效内容，显示提示
+                if (structuredContent.children.length === 0) {
+                    structuredContent.innerHTML = '<div style="color: #666; text-align: center; padding: 20px; grid-column: 1 / -1;">暂无其他结构化信息</div>';
+                }
+            } else {
+                structuredContent.innerHTML = '<div style="color: #666; text-align: center; padding: 20px; grid-column: 1 / -1;">暂无结构化信息</div>';
+            }
+        }
+
+        // 切换文本显示
+        function toggleText(textId) {
+            const textElement = document.getElementById(textId);
+            const button = event.target;
+
+            if (textElement.classList.contains('show')) {
+                textElement.classList.remove('show');
+                button.textContent = '展开';
+            } else {
+                textElement.classList.add('show');
+                button.textContent = '收起';
+            }
+        }
+
+        // 语音播报结果
+        async function speakResult() {
+            if (!currentResult) {
+                alert('暂无识别结果可播报');
+                return;
+            }
+
+            let textToSpeak = '';
+
+            if (currentResult.full_text && typeof currentResult.full_text === 'string' && currentResult.full_text.trim() !== '') {
+                // 使用完整文本，移除格式标记
+                textToSpeak = currentResult.full_text
+                    .replace(/【/g, '')
+                    .replace(/】/g, '')
+                    .replace(/\n/g, '。')
+                    .replace(/\.\s*/g, '。');
+            } else if (currentResult.structured_text) {
+                // 从结构化文本中提取关键信息
+                const name = currentResult.drug_name || currentResult.name || '未知药品';
+                const spec = safeExtract(currentResult.structured_text, ['规格', '成分']);
+                const usage = safeExtract(currentResult.structured_text, ['用法用量', '用法']);
+
+                textToSpeak = `药品名称：${name}。`;
+                if (spec && spec !== '') textToSpeak += `规格：${spec}。`;
+                if (usage && usage !== '') textToSpeak += `用法用量：${usage}。`;
+            } else {
+                textToSpeak = '识别结果为空，请重新尝试';
+            }
+
+            await callTTS(textToSpeak);
+        }
+
+        // 调用TTS服务
+        async function callTTS(text) {
+            try {
+                // 首先尝试使用Web Speech API（浏览器自带）
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); // 取消之前的播报
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'zh-CN'; // 设置为中文
+                    utterance.rate = 0.9; // 语速稍慢，适合老年人
+                    utterance.pitch = 1.0;
+                    window.speechSynthesis.speak(utterance);
+                    return;
+                }
+
+                // 如果Web Speech API不可用，尝试使用后端TTS
+                const response = await fetch('/api/common/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        spd: 5,
+                        vol: 7
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success && result.audio) {
+                    const audio = new Audio('data:audio/mp3;base64,' + result.audio);
+                    audio.play();
+                } else {
+                    // 如果后端TTS也失败，不弹窗，避免打扰用户
+                    console.error('语音播报失败：' + result.message);
+                }
+            } catch (error) {
+                console.error('TTS调用失败：', error);
+                // 不弹窗，避免打扰用户
+            }
+        }
+
+        // 字体大小控制
+        let currentFontSize = 18; // 默认字体大小
+        const minFontSize = 14;
+        const maxFontSize = 24;
+
+        document.getElementById('decrease-font').addEventListener('click', () => {
+            if (currentFontSize > minFontSize) {
+                currentFontSize -= 2;
+                document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+                localStorage.setItem('fontSize', currentFontSize);
+            }
+        });
+
+        document.getElementById('reset-font').addEventListener('click', () => {
+            currentFontSize = 18;
+            document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+            localStorage.setItem('fontSize', currentFontSize);
+        });
+
+        document.getElementById('increase-font').addEventListener('click', () => {
+            if (currentFontSize < maxFontSize) {
+                currentFontSize += 2;
+                document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+                localStorage.setItem('fontSize', currentFontSize);
+            }
+        });
+
+        // 加载保存的字体大小
+        const savedFontSize = localStorage.getItem('fontSize');
+        if (savedFontSize) {
+            currentFontSize = parseInt(savedFontSize);
+            document.documentElement.style.setProperty('--font-size-base', `${currentFontSize}px`);
+        }
+
+        // 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/static/service-worker.js')
+                    .then(function (registration) {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch(function (error) {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>
