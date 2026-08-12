@@ -142,7 +142,7 @@ except Exception as e:
     print(f"WARNING 药品OCR引擎初始化失败: {e}")
     drug_ocr_engine = None
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'), static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static'))
 CORS(app)  # 启用跨域支持
 
 # 配置JSON支持中文
