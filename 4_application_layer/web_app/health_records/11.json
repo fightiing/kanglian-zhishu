@@ -1,0 +1,112 @@
+{
+  "user_id": "11",
+  "basic_info": {
+    "name": "张三",
+    "age": "49",
+    "gender": "男",
+    "phone": "145467543456",
+    "address": ""
+  },
+  "medical_history": [
+    {
+      "disease": "高血压",
+      "diagnosis_date": "",
+      "description": "",
+      "added_at": "2026-04-26T15:32:24.064424"
+    }
+  ],
+  "allergies": [
+    {
+      "substance": "罗红霉素",
+      "reaction": "",
+      "added_at": "2026-04-26T15:32:32.767001"
+    }
+  ],
+  "medications": [
+    {
+      "name": "高血压治疗药",
+      "dosage": "",
+      "frequency": "",
+      "start_date": "",
+      "notes": "",
+      "added_at": "2026-04-26T15:32:48.899061"
+    },
+    {
+      "name": "高血压治疗药",
+      "dosage": "",
+      "frequency": "",
+      "start_date": "",
+      "notes": "",
+      "added_at": "2026-04-26T15:32:49.456600"
+    }
+  ],
+  "vital_signs": [],
+  "family_members": [
+    {
+      "name": "李四",
+      "relationship": "儿子",
+      "phone": "12345676543",
+      "email": "",
+      "can_view": true,
+      "can_edit": false,
+      "id": "12345676543",
+      "added_at": "2026-04-26T15:33:44.920350"
+    }
+  ],
+  "doctors": [],
+  "notifications": [],
+  "messages": [],
+  "access_tokens": [
+    {
+      "token": "9d5b2494e417cdaaeddbba85c1962cc8",
+      "viewer_id": "11",
+      "viewer_type": "family",
+      "created_at": "2026-04-26T15:33:53.100222",
+      "expires_at": "2027-04-26T15:33:53.100230"
+    },
+    {
+      "token": "89274d60750aa56e04c31fb20ab8f3e9",
+      "viewer_id": "12345676543",
+      "viewer_type": "family",
+      "created_at": "2026-04-26T15:39:55.033769",
+      "expires_at": "2027-04-26T15:39:55.033789"
+    },
+    {
+      "token": "89274d60750aa56e04c31fb20ab8f3e9",
+      "viewer_id": "12345676543",
+      "viewer_type": "family",
+      "created_at": "2026-04-26T15:39:55.520404",
+      "expires_at": "2027-04-26T15:39:55.520415"
+    },
+    {
+      "token": "11779ea2297d3fe097c92b1e79886a5b",
+      "viewer_id": "12345676543",
+      "viewer_type": "family",
+      "created_at": "2026-04-26T16:37:53.708270",
+      "expires_at": "2027-04-26T16:37:53.708279"
+    },
+    {
+      "token": "7e28d35e5537e76394dfb855d4261e3e",
+      "viewer_id": "12345676543",
+      "viewer_type": "family",
+      "created_at": "2026-04-26T22:26:20.971017",
+      "expires_at": "2027-04-26T22:26:20.971027"
+    },
+    {
+      "token": "0e388db7f9109d65784518768a3fb6d5",
+      "viewer_id": "12345676543",
+      "viewer_type": "family",
+      "created_at": "2026-04-27T16:11:23.683284",
+      "expires_at": "2027-04-27T16:11:23.683295"
+    },
+    {
+      "token": "b5ecd9237354931cb4fa6244570b458c",
+      "viewer_id": "12345676543",
+      "viewer_type": "family",
+      "created_at": "2026-04-29T21:36:15.202189",
+      "expires_at": "2027-04-29T21:36:15.202200"
+    }
+  ],
+  "created_at": "2026-04-26T15:32:14.445320",
+  "updated_at": "2026-04-26T15:33:44.920952"
+}
