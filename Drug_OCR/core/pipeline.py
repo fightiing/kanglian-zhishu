@@ -61,16 +61,42 @@
 #         return "\n\n".join(parts)
 
 from typing import Any, Dict, List
-import cv2
 from pathlib import Path
 
-from ocr.ocr_engine import RapidOCREngine
-from ai.llm_structured_extractor import LLMStructuredExtractor
+# 把重型依赖改为延迟导入，避免云端安装失败时整个服务崩溃
+try:
+    import cv2
+    HAS_CV2 = True
+except ImportError:
+    cv2 = None
+    HAS_CV2 = False
+
+try:
+    from ocr.ocr_engine import RapidOCREngine
+    HAS_RAPIDOCR = True
+except ImportError:
+    RapidOCREngine = None
+    HAS_RAPIDOCR = False
+
+try:
+    from ai.llm_structured_extractor import LLMStructuredExtractor
+    HAS_LLM_EXTRACTOR = True
+except ImportError:
+    LLMStructuredExtractor = None
+    HAS_LLM_EXTRACTOR = False
+
 from core.models import EngineResult
 
-from layout.yolo_layout_detector import YoloLayoutDetector
-from layout.block_builder import build_blocks
-from layout.block_sorter import sort_blocks_reading_order
+try:
+    from layout.yolo_layout_detector import YoloLayoutDetector
+    from layout.block_builder import build_blocks
+    from layout.block_sorter import sort_blocks_reading_order
+    HAS_LAYOUT = True
+except ImportError:
+    YoloLayoutDetector = None
+    build_blocks = None
+    sort_blocks_reading_order = None
+    HAS_LAYOUT = False
 
 
 class RecognitionPipeline:
@@ -79,6 +105,14 @@ class RecognitionPipeline:
     """
 
     def __init__(self, device: str = "cpu"):
+        if not HAS_CV2:
+            raise ImportError("opencv-python 未安装，OCR管线不可用")
+        if not HAS_RAPIDOCR:
+            raise ImportError("rapidocr-onnxruntime 未安装，OCR管线不可用")
+        if not HAS_LLM_EXTRACTOR:
+            raise ImportError("LLM提取器依赖未安装，OCR管线不可用")
+        if not HAS_LAYOUT:
+            raise ImportError("版面检测依赖未安装，OCR管线不可用")
         self.ocr_engine = RapidOCREngine()
         self.llm_extractor = LLMStructuredExtractor()
         self.yolo_detector = YoloLayoutDetector(device=device)
