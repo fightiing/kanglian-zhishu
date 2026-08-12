@@ -89,14 +89,19 @@ langchain_module = importlib.util.module_from_spec(langchain_spec)
 langchain_spec.loader.exec_module(langchain_module)
 get_langchain_service = langchain_module.get_langchain_service
 
-config_spec = importlib.util.spec_from_file_location(
-    "langchain_config",
-    os.path.join(project_root, "0_infrastructure", "langchain_config.py")
-)
-config_module = importlib.util.module_from_spec(config_spec)
-config_spec.loader.exec_module(config_module)
-LANGCHAIN_CONFIG = config_module.LANGCHAIN_CONFIG
-NEO4J_CONFIG = config_module.NEO4J_CONFIG
+# 导入配置（如果文件存在）
+LANGCHAIN_CONFIG = {}
+NEO4J_CONFIG = {}
+try:
+    _config_path = os.path.join(project_root, "0_infrastructure", "langchain_config.py")
+    if os.path.exists(_config_path):
+        config_spec = importlib.util.spec_from_file_location("langchain_config", _config_path)
+        config_module = importlib.util.module_from_spec(config_spec)
+        config_spec.loader.exec_module(config_module)
+        LANGCHAIN_CONFIG = config_module.LANGCHAIN_CONFIG
+        NEO4J_CONFIG = config_module.NEO4J_CONFIG
+except Exception as e:
+    print(f"WARNING 配置加载失败: {e}，使用默认配置")
 
 # 导入健康档案管理模块
 health_spec = importlib.util.spec_from_file_location(
