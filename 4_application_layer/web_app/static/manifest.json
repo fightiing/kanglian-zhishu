@@ -1,0 +1,28 @@
+﻿{
+  "name": "康联智枢",
+  "short_name": "康联智枢",
+  "description": "康联智枢——面向主动健康的知识驱动医疗智能协同网络",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF8F0",
+  "theme_color": "#8B6F47",
+  "icons": [
+    {
+      "src": "/static/1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/1.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "orientation": "portrait",
+  "categories": ["health", "medical"],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "lang": "zh-CN"
+}
